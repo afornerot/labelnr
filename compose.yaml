@@ -29,6 +29,7 @@ services:
       - ./public/uploads:/app/public/uploads:delegated
       - ./misc:/app/misc:delegated
       - ./public/lib:/app/public/lib:delegated
+      - ./public/medias:/app/public/medias:delegated
       - ./.env.local:/app/.env.local
 
   adminer:

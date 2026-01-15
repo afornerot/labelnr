@@ -5,9 +5,12 @@ namespace App\Entity;
 use App\Repository\TIRRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: TIRRepository::class)]
+#[UniqueEntity(fields: ['code'], message: 'Ce code est déjà utilisé.')]
 class TIR
 {
     #[ORM\Id]
@@ -28,6 +31,18 @@ class TIR
      */
     #[ORM\OneToMany(targetEntity: DMR::class, mappedBy: 'tir', orphanRemoval: true)]
     private Collection $dmrs;
+
+    #[ORM\Column(length: 10, unique: true)]
+    private ?string $code = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $title = null;
+
+    #[ORM\Column(length: 500, nullable: true)]
+    private ?string $summary = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $description = null;
 
     public function __construct()
     {
@@ -89,6 +104,54 @@ class TIR
                 $dmr->setTir(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
+
+    public function setCode(string $code): static
+    {
+        $this->code = $code;
+
+        return $this;
+    }
+
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+    public function setTitle(string $title): static
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    public function getSummary(): ?string
+    {
+        return $this->summary;
+    }
+
+    public function setSummary(?string $summary): static
+    {
+        $this->summary = $summary;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
 
         return $this;
     }
