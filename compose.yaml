@@ -1,0 +1,39 @@
+services:
+  mariadb:
+    image: mariadb
+    container_name: labelnr-mariadb
+    restart: unless-stopped  
+    environment:
+      MYSQL_ROOT_PASSWORD: changeme
+      MYSQL_DATABASE: labelnr
+      MYSQL_USER: user
+      MYSQL_PASSWORD: changeme
+    volumes:
+      - ./volume/mariadb:/var/lib/mysql
+
+  labelnr:
+    build:
+      context: .
+      dockerfile: ./misc/docker/Dockerfile
+    container_name: labelnr
+    restart: unless-stopped  
+    image: reg.cadoles.com/envole/labelnr
+    depends_on: 
+      - mariadb
+    ports:
+      - "8008:80"
+    volumes:
+      - ./src:/app/src:delegated
+      - ./templates:/app/templates:delegated
+      - ./config:/app/config:delegated
+      - ./public/uploads:/app/public/uploads:delegated
+      - ./misc:/app/misc:delegated
+      - ./public/lib:/app/public/lib:delegated
+      - ./.env.local:/app/.env.local
+
+  adminer:
+    image: adminer
+    container_name: labelnr-adminer
+    restart: always
+    ports:
+      - 6088:8080
