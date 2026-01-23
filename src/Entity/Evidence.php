@@ -2,20 +2,18 @@
 
 namespace App\Entity;
 
-use App\Repository\StakeRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Repository\EvidenceRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: StakeRepository::class)]
-class Stake
+#[ORM\Entity(repositoryClass: EvidenceRepository::class)]
+class Evidence
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'stakes')]
+    #[ORM\ManyToOne(inversedBy: 'evidences')]
     #[ORM\JoinColumn(nullable: false)]
     private ?PA $pa = null;
 

@@ -14,18 +14,20 @@
                 <thead>
                 <tr>
                     <th width="70px" class="no-sort">Action</th>
+                    <th>Axe</th>
+                    <th>Axe Titre</th>
                     <th width="70px">Code</th>
                     <th>Titre</th>
-                    <th>Valeur</th>
                 </tr>
                 </thead>
                 <tbody>
-                    {% for maturity in maturitys %}
+                    {% for pa in pas %}
                         <tr>
-                            <td class="text-center"><a href="{{ path(routeupdate,{id:maturity.id}) }}"><i class="fas fa-file fa-2x"></i></a></td>
-                            <td class="text-center">{{maturity.code}}</td>
-                            <td>{{maturity.title}}</td>
-                            <td>{{maturity.value}}</td>
+                            <td class="text-center"><a href="{{ path(routeupdate,{id:pa.id}) }}"><i class="fas fa-file fa-2x"></i></a></td>
+                            <td class="text-center">{{pa.thematic.code}}</td>
+                            <td class="text-center">{{pa.thematic.title}}</td>
+                            <td class="text-center">{{pa.code}}</td>
+                            <td>{{pa.title}}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -41,7 +43,7 @@
                 columnDefs: [ { "targets": "no-sort", "orderable": false }, { "targets": "no-string", "type" : "num" } ],
                 responsive: true,
                 iDisplayLength: 100,
-                order: [[ 1, "asc" ]]
+                order: [[ 1, "asc" ],[ 3, "asc" ]]
             });
         });
     </script>

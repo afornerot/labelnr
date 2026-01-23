@@ -16,6 +16,7 @@
                     <th width="70px" class="no-sort">Action</th>
                     <th width="70px">Code</th>
                     <th>Titre</th>
+                    <th>Valeur</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -24,6 +25,7 @@
                             <td class="text-center"><a href="{{ path(routeupdate,{id:materiality.id}) }}"><i class="fas fa-file fa-2x"></i></a></td>
                             <td class="text-center">{{materiality.code}}</td>
                             <td>{{materiality.title}}</td>
+                            <td>{{materiality.value}}</td>
                         </tr>
                     {% endfor %}
                 </tbody>

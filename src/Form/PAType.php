@@ -2,7 +2,7 @@
 
 namespace App\Form;
 
-use App\Entity\Materiality;
+use App\Entity\PA;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -10,7 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class MaterialityType extends AbstractType
+class PAType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -38,7 +38,7 @@ class MaterialityType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => Materiality::class,
+            'data_class' => PA::class,
             'csrf_protection' => true,
             'csrf_field_name' => '_token',
             'csrf_token_id' => static::class,

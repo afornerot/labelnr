@@ -17,21 +17,22 @@ class MaterialityFixtures extends Fixture
     public function load(ObjectManager $manager): void
     {
         $data = [
-            ['code' => 'MAT-L', 'title' => 'Faible'],
-            ['code' => 'MAT-M', 'title' => 'Moyenne'],
-            ['code' => 'MAT-H', 'title' => 'Forte'],
+            ['code' => '001', 'title' => 'Exclu', 'value' => null],
+            ['code' => '002', 'title' => 'Important', 'value' => 500],
+            ['code' => '003', 'title' => 'Essentiel', 'value' => 1000],
         ];
 
         foreach ($data as $item) {
-            $materiality = $this->materialityRepository->findByCode($item['code']);
+            $materiality = $this->materialityRepository->findOneBy(['code' => $item['code']]);
             if (!$materiality) {
                 $materiality = new Materiality();
                 $materiality->setCode($item['code']);
-                $manager->persist($materiality);
+                $this->addReference('materiality_'.$item['code'], $materiality);
             }
-            $materiality->setTitle($item['title']);
 
-            $this->addReference('materiality_'.$item['code'], $materiality);
+            $materiality->setTitle($item['title']);
+            $materiality->setValue($item['value']);
+            $manager->persist($materiality);
         }
 
         $manager->flush();

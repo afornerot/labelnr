@@ -27,10 +27,10 @@ class PA
     private ?Materiality $materiality = null;
 
     /**
-     * @var Collection<int, Stake>
+     * @var Collection<int, Evidence>
      */
-    #[ORM\OneToMany(targetEntity: Stake::class, mappedBy: 'pa', orphanRemoval: true)]
-    private Collection $stakes;
+    #[ORM\OneToMany(targetEntity: Evidence::class, mappedBy: 'pa', orphanRemoval: true)]
+    private Collection $evidences;
 
     /**
      * @var Collection<int, TIR>
@@ -52,8 +52,22 @@ class PA
 
     public function __construct()
     {
-        $this->stakes = new ArrayCollection();
+        $this->evidences = new ArrayCollection();
         $this->tirs = new ArrayCollection();
+    }
+
+    public function getScore(): ?float
+    {
+        $total = 0;
+        $count = 0;
+        foreach ($this->tirs as $tir) {
+            if (!is_null($tir->getMaturity()->getValue())) {
+                $total += $tir->getMaturity()->getValue();
+                ++$count;
+            }
+        }
+
+        return ($count > 0) ? ($total / $count) : null;
     }
 
     public function getId(): ?int
@@ -86,29 +100,29 @@ class PA
     }
 
     /**
-     * @return Collection<int, Stake>
+     * @return Collection<int, Evidence>
      */
-    public function getStakes(): Collection
+    public function getEvidences(): Collection
     {
-        return $this->stakes;
+        return $this->evidences;
     }
 
-    public function addStake(Stake $stake): static
+    public function addEvidence(Evidence $evidence): static
     {
-        if (!$this->stakes->contains($stake)) {
-            $this->stakes->add($stake);
-            $stake->setPa($this);
+        if (!$this->evidences->contains($evidence)) {
+            $this->evidences->add($evidence);
+            $evidence->setPa($this);
         }
 
         return $this;
     }
 
-    public function removeStake(Stake $stake): static
+    public function removeEvidence(Evidence $evidence): static
     {
-        if ($this->stakes->removeElement($stake)) {
+        if ($this->evidences->removeElement($evidence)) {
             // set the owning side to null (unless already changed)
-            if ($stake->getPa() === $this) {
-                $stake->setPa(null);
+            if ($evidence->getPa() === $this) {
+                $evidence->setPa(null);
             }
         }
 

@@ -6,8 +6,11 @@ use App\Repository\ThematicRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: ThematicRepository::class)]
+#[UniqueEntity(fields: ['code'], message: 'Ce code est déjà utilisé.')]
+
 class Thematic
 {
     #[ORM\Id]
@@ -21,9 +24,41 @@ class Thematic
     #[ORM\OneToMany(targetEntity: PA::class, mappedBy: 'thematic', orphanRemoval: true)]
     private Collection $pas;
 
+    #[ORM\Column(length: 10, unique: true)]
+    private ?string $code = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $title = null;
+
     public function __construct()
     {
         $this->pas = new ArrayCollection();
+    }
+
+    public function getScore(): ?float
+    {
+        $total = 0;
+        $count = 0;
+        foreach ($this->pas as $pa) {
+            foreach ($pa->getTirs() as $tir) {
+                if (!is_null($tir->getMaturity()->getValue())) {
+                    $total += $tir->getMaturity()->getValue();
+                }
+            }
+            $count += count($pa->getTirs());
+        }
+
+        return ($count > 0) ? ($total / $count) : null;
+    }
+
+    public function getLength(): int
+    {
+        $total = 0;
+        foreach ($this->pas as $pa) {
+            $total += count($pa->getTirs());
+        }
+
+        return $total;
     }
 
     public function getId(): ?int
@@ -61,5 +96,27 @@ class Thematic
         return $this;
     }
 
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
 
+    public function setCode(string $code): static
+    {
+        $this->code = $code;
+
+        return $this;
+    }
+
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+    public function setTitle(string $title): static
+    {
+        $this->title = $title;
+
+        return $this;
+    }
 }

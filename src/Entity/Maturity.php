@@ -29,6 +29,9 @@ class Maturity
     #[ORM\Column(length: 255)]
     private ?string $title = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $value = null;
+
     public function __construct()
     {
         $this->tirs = new ArrayCollection();
@@ -89,6 +92,18 @@ class Maturity
     public function setTitle(string $title): static
     {
         $this->title = $title;
+
+        return $this;
+    }
+
+    public function getValue(): ?int
+    {
+        return $this->value;
+    }
+
+    public function setValue(?int $value): static
+    {
+        $this->value = $value;
 
         return $this;
     }
