@@ -29,6 +29,19 @@ class PAFixtures extends Fixture
             ['thematic' => '2', 'materiality' => '002', 'code' => 'PA05', 'title' => 'Intégrer l\'accessibilité numérique'],
             ['thematic' => '2', 'materiality' => '002', 'code' => 'PA06', 'title' => 'Favoriser et accompagner le développement des compétences en NR'],
             ['thematic' => '2', 'materiality' => '002', 'code' => 'PA07', 'title' => 'Faire de sa communication une vitrine de son engagement NR'],
+
+            ['thematic' => '3', 'materiality' => '002', 'code' => 'PA08', 'title' => 'Favoriser la sobriété et l\'allongement de la durée de vie dès la phase d\'achats'],
+            ['thematic' => '3', 'materiality' => '002', 'code' => 'PA09', 'title' => 'Adopter une gestion responsable de ses équipements (poste de travail, impression, téléphonie, consommables...)'],
+            ['thematic' => '3', 'materiality' => '002', 'code' => 'PA10', 'title' => 'Adopter une gestion responsable de ses logiciels, applications et services distants'],
+            ['thematic' => '3', 'materiality' => '002', 'code' => 'PA11', 'title' => 'Adopter une gestion responsable de ses infrastructures (réseaux, serveurs, centre de données...)'],
+            ['thematic' => '3', 'materiality' => '002', 'code' => 'PA12', 'title' => 'Adopter une gestion responsable des données'],
+
+            ['thematic' => '4', 'materiality' => '002', 'code' => 'PA13', 'title' => 'Encourager la mutualisation des outils et de la connaissance'],
+            ['thematic' => '4', 'materiality' => '002', 'code' => 'PA14', 'title' => 'Valoriser le numérique comme levier d\'action'],
+
+            ['thematic' => '5', 'materiality' => '003', 'code' => 'PA17', 'title' => 'Promouvoir le NR dans ses offres commerciales'],
+            ['thematic' => '5', 'materiality' => '002', 'code' => 'PA18', 'title' => 'Réaliser une prestation en accord avec la démarche NR'],
+            ['thematic' => '5', 'materiality' => '002', 'code' => 'PA19', 'title' => 'Intégrer le NR à l\'amélioration continue de ses prestations'],
         ];
 
         foreach ($data as $item) {

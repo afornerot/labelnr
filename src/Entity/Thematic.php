@@ -40,12 +40,17 @@ class Thematic
         $total = 0;
         $count = 0;
         foreach ($this->pas as $pa) {
+            $havevalue = false;
             foreach ($pa->getTirs() as $tir) {
                 if (!is_null($tir->getMaturity()->getValue())) {
                     $total += $tir->getMaturity()->getValue();
+                    $havevalue = true;
                 }
             }
-            $count += count($pa->getTirs());
+
+            if ($havevalue) {
+                $count += count($pa->getTirs());
+            }
         }
 
         return ($count > 0) ? ($total / $count) : null;

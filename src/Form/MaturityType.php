@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Maturity;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -26,6 +27,11 @@ class MaturityType extends AbstractType
 
         ->add('title', TextType::class, [
             'label' => 'Titre',
+        ])
+
+        ->add('value', IntegerType::class, [
+            'label' => 'Valeur',
+            'required' => false,
         ]);
     }
 
