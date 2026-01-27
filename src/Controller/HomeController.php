@@ -2,7 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\DMR;
 use App\Entity\TIR;
+use App\Enum\DMRTypeEnum;
+use App\Repository\DMRRepository;
 use App\Repository\MaturityRepository;
 use App\Repository\PARepository;
 use App\Repository\ThematicRepository;
@@ -19,6 +22,7 @@ class HomeController extends AbstractController
         private readonly ThematicRepository $thematicRepository,
         private readonly PARepository $paRepository,
         private readonly MaturityRepository $maturityRepository,
+        private readonly DMRRepository $dmrRepository,
         private readonly EntityManagerInterface $em,
     ) {
     }
@@ -56,6 +60,55 @@ class HomeController extends AbstractController
         $tir = $this->em->getRepository(TIR::class)->find($tirId);
         if ($tir) {
             $tir->setComment($comment);
+            $this->em->flush();
+        }
+
+        return $this->renderTableFragment('home/table.html.twig');
+    }
+
+    #[Route('/user/tir/submitdmr', name: 'app_tir_submitdmr', methods: ['POST'])]
+    public function submitTirDmr(Request $request): Response
+    {
+        $tirId = $request->request->get('tirId');
+        $type = $request->request->get('type');
+        $comment = $request->request->get('comment');
+
+        $tir = $this->em->getRepository(TIR::class)->find($tirId);
+        if ($tir) {
+            $dmr = new DMR();
+            $dmr->setTir($tir);
+            $dmr->setType(DMRTypeEnum::tryFrom($type));
+            $dmr->setComment($comment);
+            $this->em->persist($dmr);
+            $this->em->flush();
+        }
+
+        return $this->renderTableFragment('home/table.html.twig');
+    }
+
+    #[Route('/user/tir/updatedmr', name: 'app_tir_updatedmr', methods: ['POST'])]
+    public function updateTirDmr(Request $request): Response
+    {
+        $dmrId = $request->request->get('dmrId');
+        $comment = $request->request->get('comment');
+
+        $dmr = $this->dmrRepository->find($dmrId);
+        if ($dmr) {
+            $dmr->setComment($comment);
+            $this->em->flush();
+        }
+
+        return $this->renderTableFragment('home/table.html.twig');
+    }
+
+    #[Route('/user/tir/deletedmr', name: 'app_tir_deletedmr', methods: ['POST'])]
+    public function deleteTirDmr(Request $request): Response
+    {
+        $dmrId = $request->request->get('dmrId');
+
+        $dmr = $this->dmrRepository->find($dmrId);
+        if ($dmr) {
+            $this->em->remove($dmr);
             $this->em->flush();
         }
 

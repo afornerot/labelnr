@@ -43,24 +43,89 @@
 {% block body %}
     {# On inclut le fragment pour le premier affichage au chargement de la page #}
     {% include 'home/table.html.twig' %}
+
+    <!-- Modal de création de DMR -->
+    <div class="modal fade" id="dmrModal" tabindex="-1" role="dialog" aria-labelledby="dmrModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="dmrModalLabel">Ajouter un élément</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="dmrForm">
+                    <div class="modal-body">
+                        <input type="hidden" id="dmrTirId" name="tirId">
+                        <input type="hidden" id="dmrType" name="type">
+                        <input type="hidden" id="dmrId" name="dmrId">
+                        <div class="form-group">
+                            <label for="dmrComment">Commentaire</label>
+                            <textarea class="form-control" id="dmrComment" name="comment" rows="4" required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <div>
+                            <button type="button" class="btn btn-danger" id="deleteDmrBtn" style="display: none;">Supprimer</button>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                            <button type="submit" class="btn btn-primary">Enregistrer</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block localscript %}
 <script>
     function autosize(textarea) {
         textarea.style.height = 'auto';
-        console.log(textarea.scrollHeight);
-        textarea.style.height = textarea.scrollHeight + 'px';
+        textarea.style.height = textarea.scrollHeight + 10 + 'px';
     }
 
     function initializeAutosize() {
-        $('.textarea-comment').each(function() {
+        $('.textarea-comment:visible').each(function() {
             autosize(this);
         });
     }
 
+    function saveCollapseState() {
+        var openIds = [];
+        $('.collapse.show').each(function() {
+            openIds.push($(this).attr('id'));
+        });
+        localStorage.setItem('openedCollapses', JSON.stringify(openIds));
+    }
+
+    function restoreCollapseState() {
+        var stored = localStorage.getItem('openedCollapses');
+        if (stored) {
+            var openIds = JSON.parse(stored);
+            openIds.forEach(function(id) {
+                var $target = $('#' + id);
+                if ($target.length) {
+                    $target.addClass('show');
+                    $(`[data-bs-target="#${id}"]`).attr('aria-expanded', 'true');
+                }
+            });
+        }
+    }
+
     $(document).ready(function() {
+        restoreCollapseState();
         initializeAutosize();
+
+        $(document).on('shown.bs.collapse', '.collapse', function () {
+            saveCollapseState();
+            $(this).find('.textarea-comment').each(function() {
+                autosize(this);
+            });
+        });
+
+        $(document).on('hidden.bs.collapse', '.collapse', function () {
+            saveCollapseState();
+        });
 
         $(document).on('input', '.textarea-comment', function() {
             autosize(this);
@@ -68,12 +133,6 @@
 
         $(document).on('change', '.select-maturity', function() {
             const $select = $(this);
-
-            const openIds = [];
-            $('.collapse.show').each(function() {
-                openIds.push($(this).attr('id'));
-            });
-            
             const data = {
                 tirId: $select.data('tir-id'),
                 maturityId: $select.val()
@@ -87,15 +146,8 @@
                 data: data,
                 success: function(response) {
                     $('#table-container').replaceWith(response);
-
-                    openIds.forEach(function(id) {
-                        const $target = $('#' + id);
-                        if ($target.length) {
-                            $target.addClass('show');
-                            $(`[data-target="#${id}"], [data-bs-target="#${id}"]`).attr('aria-expanded', 'true');
-                        }
-                    });
-                    initializeAutosize();
+                    restoreCollapseState();
+                    setTimeout(initializeAutosize, 1);
                 },
                 error: function() {
                     alert("Erreur lors de la mise à jour des données.");
@@ -106,12 +158,6 @@
 
         $(document).on('change', '.textarea-comment', function() {
             const $textarea = $(this);
-
-            const openIds = [];
-            $('.collapse.show').each(function() {
-                openIds.push($(this).attr('id'));
-            });
-            
             const data = {
                 tirId: $textarea.data('tir-id'),
                 comment: $textarea.val()
@@ -125,15 +171,8 @@
                 data: data,
                 success: function(response) {
                     $('#table-container').replaceWith(response);
-
-                    openIds.forEach(function(id) {
-                        const $target = $('#' + id);
-                        if ($target.length) {
-                            $target.addClass('show');
-                            $(`[data-target="#${id}"], [data-bs-target="#${id}"]`).attr('aria-expanded', 'true');
-                        }
-                    });
-                    initializeAutosize();
+                    restoreCollapseState();
+                    setTimeout(initializeAutosize, 1);
                 },
                 error: function() {
                     alert("Erreur lors de la mise à jour du commentaire.");
@@ -142,9 +181,105 @@
             });
         });
 
-        $(document).on('click', '.btn-collapse', function() {
-            const target = $(this).data('target');
-            $(target).collapse('toggle');
+        // --- Gestion de la modale DMR ---
+
+        // Initialisation de la modale avec les bonnes données
+        $('#dmrModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget); // Bouton qui a déclenché la modale
+            var modal = $(this);
+            var deleteBtn = modal.find('#deleteDmrBtn');
+            
+            // Réinitialisation des champs
+            modal.find('#dmrId').val('');
+            modal.find('#dmrTirId').val('');
+            modal.find('#dmrType').val('');
+            modal.find('#dmrComment').val('');
+            deleteBtn.hide();
+
+            if (button.data('dmr-id')) {
+                // Mode Modification
+                var dmrId = button.data('dmr-id');
+                var comment = button.html().replace(/<br\s*\/?>/gi, "\n");
+                
+                modal.find('.modal-title').text('Modifier l\'élément');
+                modal.find('#dmrId').val(dmrId);
+                modal.find('#dmrComment').val(comment);
+                deleteBtn.show();
+            } else {
+                // Mode Création
+                var tirId = button.data('tir-id');
+                var dmrType = button.data('dmr-type');
+                var typeText = dmrType.charAt(0).toUpperCase() + dmrType.slice(1);
+
+                modal.find('.modal-title').text('Ajouter : ' + typeText);
+                modal.find('#dmrTirId').val(tirId);
+                modal.find('#dmrType').val(dmrType);
+            }
+            
+            // Focus sur le textarea
+            setTimeout(function() {
+                modal.find('#dmrComment').focus();
+            }, 500);
+        });
+
+        // Soumission du formulaire de la modale en AJAX
+        $('#dmrForm').on('submit', function(e) {
+            e.preventDefault();
+
+            const $form = $(this);
+            const data = $form.serialize();
+            const dmrId = $form.find('#dmrId').val();
+            
+            // Choix de la route selon si c'est une création ou une modification
+            const url = dmrId ? "{{ path('app_tir_updatedmr') }}" : "{{ path('app_tir_submitdmr') }}";
+
+            $('#table-container').css('opacity', 0.5);
+            $('#dmrModal').modal('hide');
+
+            $.ajax({
+                url: url,
+                method: 'POST',
+                data: data,
+                success: function(response) {
+                    $('#table-container').replaceWith(response);
+                    restoreCollapseState();
+                    setTimeout(initializeAutosize, 1);
+                },
+                error: function() {
+                    alert("Erreur lors de l'enregistrement.");
+                    $('#table-container').css('opacity', 1);
+                }
+            });
+        });
+
+        $('#deleteDmrBtn').on('click', function() {
+            if (!confirm("Êtes-vous sûr de vouloir supprimer cet élément ?")) {
+                return;
+            }
+
+            const dmrId = $('#dmrId').val();
+            if (!dmrId) {
+                alert('Erreur : ID de l\'élément non trouvé.');
+                return;
+            }
+
+            $('#table-container').css('opacity', 0.5);
+            $('#dmrModal').modal('hide');
+
+            $.ajax({
+                url: "{{ path('app_tir_deletedmr') }}",
+                method: 'POST',
+                data: { dmrId: dmrId },
+                success: function(response) {
+                    $('#table-container').replaceWith(response);
+                    restoreCollapseState();
+                    setTimeout(initializeAutosize, 1);
+                },
+                error: function() {
+                    alert("Erreur lors de la suppression de l'élément.");
+                    $('#table-container').css('opacity', 1);
+                }
+            });
         });
     });
 </script>

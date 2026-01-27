@@ -45,8 +45,8 @@
                         {# Le titre devient le déclencheur de l'accordéon #}
                         <surline class="d-flex btn-collapse" 
                                  style="cursor: pointer;"
-                                 data-toggle="collapse" 
-                                 data-target="#collapse-{{ pa.code }}"
+                                 data-bs-toggle="collapse" 
+                                 data-bs-target="#collapse-{{ pa.code }}"
                                  aria-expanded="false" 
                                  aria-controls="collapse-{{ pa.code }}">
                             <span class="flex-grow-1"><strong>{{ pa.code }}</strong> = {{ pa.title }}</span>
@@ -68,10 +68,62 @@
                                         <tr>
                                             <td width="70px">{{ tir.code }}</td>
                                             <td>
-                                                {{ tir.title }}<br>
+                                                {{ tir.title }}<br><br>
                                                 Commentaire =<br>
                                                 <textarea class="form-control textarea-comment" data-tir-id="{{ tir.id }}" rows="2">{{ tir.comment }}</textarea>
+                                                <table class="table table-sm table-striped table-bordered mt-2" style="width:100%;">
+                                                    <thead>
+                                                        <tr>
+                                                            <td width="33.33333%">
+                                                                <div class="d-flex justify-content-beetween">
+                                                                    <span class="flex-grow-1">Documentation</span>
+                                                                    <button class="btn btn-sm btn-success float-right open-dmr-modal" data-bs-toggle="modal" data-bs-target="#dmrModal" data-tir-id="{{ tir.id }}" data-dmr-type="documentation" title="Ajouter Documentation">
+                                                                        <i class="fas fa-plus"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </td>
+                                                            <td width="33.33333%">
+                                                                <div class="d-flex justify-content-beetween">
+                                                                    <span class="flex-grow-1">Moyen</span>
+                                                                    <button class="btn btn-sm btn-success float-right open-dmr-modal" data-bs-toggle="modal" data-bs-target="#dmrModal" data-tir-id="{{ tir.id }}" data-dmr-type="moyen" title="Ajouter Moyen">
+                                                                        <i class="fas fa-plus"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </td>
+                                                            <td width="33.33333%">
+                                                                <div class="d-flex justify-content-beetween">
+                                                                    <span class="flex-grow-1">Résultat</span>
+                                                                    <button class="btn btn-sm btn-success float-right open-dmr-modal" data-bs-toggle="modal" data-bs-target="#dmrModal" data-tir-id="{{ tir.id }}" data-dmr-type="resultat" title="Ajouter Résultat">
+                                                                        <i class="fas fa-plus"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </thead>
+
+                                                    <tr>
+                                                        <td>
+                                                            {% for doc in tir.dmrs|filter(d => d.type.value == 'documentation') %}
+                                                                {{ not loop.first?"<hr>"}}
+                                                                <p class="dmr-item" style="cursor:pointer" data-dmr-id="{{ doc.id }}" data-bs-toggle="modal" data-bs-target="#dmrModal" title="Modifier">{{ doc.comment|nl2br }}</p> 
+                                                            {% endfor %}
+                                                        </td>
+                                                        <td>
+                                                            {% for doc in tir.dmrs|filter(d => d.type.value == 'moyen') %}
+                                                                {{ not loop.first?"<hr>"}}
+                                                                <p class="dmr-item" style="cursor:pointer" data-dmr-id="{{ doc.id }}" data-bs-toggle="modal" data-bs-target="#dmrModal" title="Modifier">{{ doc.comment|nl2br }}</p> 
+                                                            {% endfor %}
+                                                        </td>
+                                                        <td>
+                                                            {% for doc in tir.dmrs|filter(d => d.type.value == 'resultat') %}
+                                                                {{ not loop.first?"<hr>"}}
+                                                                <p class="dmr-item" style="cursor:pointer" data-dmr-id="{{ doc.id }}" data-bs-toggle="modal" data-bs-target="#dmrModal" title="Modifier">{{ doc.comment|nl2br }}</p> 
+                                                            {% endfor %}
+                                                        </td>
+                                                    </tr>
+                                                </table>
                                             </td>
+
                                             <td width="150px">
                                                 <select class="form-control form-control-sm select-maturity" data-tir-id="{{ tir.id }}">
                                                     {% for maturity in maturitys %}
