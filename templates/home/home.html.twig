@@ -17,19 +17,20 @@
 
     #table-container { transition: opacity 0.3s ease; }
 
-    surline.btn-collapse:hover {
+    .btn-collapse:hover {
         background-color: #f8f9fa !important;
+        color: #000;
         filter: brightness(95%);
     }
 
-    surline.btn-collapse::after {
+    .btn-collapse::after {
         content: '▼';
         font-size: 0.8em;
         margin-left: 10px;
         transition: transform 0.3s;
     }
 
-    surline.btn-collapse[aria-expanded="true"]::after {
+    .btn-collapse[aria-expanded="true"]::after {
         transform: rotate(180deg);
     }
 
@@ -280,6 +281,12 @@
                     $('#table-container').css('opacity', 1);
                 }
             });
+        });
+
+        $(document).on('click', '.btn-toggle-all', function() {
+            var target = $(this).data('target');
+            var action = $(this).data('action');
+            $(target).collapse(action);
         });
     });
 </script>

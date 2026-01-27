@@ -27,6 +27,7 @@ services:
       - ./templates:/app/templates:delegated
       - ./config:/app/config:delegated
       - ./public/uploads:/app/public/uploads:delegated
+      - ./uploads:/app/uploads:delegated
       - ./misc:/app/misc:delegated
       - ./public/lib:/app/public/lib:delegated
       - ./public/medias:/app/public/medias:delegated

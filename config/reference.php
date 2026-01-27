@@ -1560,6 +1560,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         root_folder?: bool|Param, // Default: false
  *     }>,
  * }
+ * @psalm-type BnineFilesConfig = array<mixed>
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,
  *     parameters?: ParametersConfig,
@@ -1574,6 +1575,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     security?: SecurityConfig,
  *     monolog?: MonologConfig,
  *     oneup_uploader?: OneupUploaderConfig,
+ *     bnine_files?: BnineFilesConfig,
  *     "when@dev"?: array{
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
@@ -1591,6 +1593,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         monolog?: MonologConfig,
  *         maker?: MakerConfig,
  *         oneup_uploader?: OneupUploaderConfig,
+ *         bnine_files?: BnineFilesConfig,
  *     },
  *     "when@prod"?: array{
  *         imports?: ImportsConfig,
@@ -1606,6 +1609,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         security?: SecurityConfig,
  *         monolog?: MonologConfig,
  *         oneup_uploader?: OneupUploaderConfig,
+ *         bnine_files?: BnineFilesConfig,
  *     },
  *     "when@test"?: array{
  *         imports?: ImportsConfig,
@@ -1622,6 +1626,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         security?: SecurityConfig,
  *         monolog?: MonologConfig,
  *         oneup_uploader?: OneupUploaderConfig,
+ *         bnine_files?: BnineFilesConfig,
  *     },
  *     ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias
  *         imports?: ImportsConfig,

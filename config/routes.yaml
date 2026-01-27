@@ -9,3 +9,7 @@
 
 controllers:
     resource: routing.controllers
+
+bninefilesbundle:
+    resource: '@BnineFilesBundle/config/routes.yaml'
+    prefix: '/bninefiles'

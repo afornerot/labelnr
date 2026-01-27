@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8aed95eb63c81d5c954cc5f0c13b90b1",
+    "content-hash": "ff7bb09b52ea466a9306065e52c5d0d5",
     "packages": [
         {
             "name": "apereo/phpcas",
@@ -76,6 +76,67 @@
                 "source": "https://github.com/apereo/phpCAS/tree/1.6.1"
             },
             "time": "2023-02-19T19:52:35+00:00"
+        },
+        {
+            "name": "bnine/filesbundle",
+            "version": "v1.0.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/afornerot/bNine-FilesBundle.git",
+                "reference": "add22ab4bd7c7342968e901294a2990b7efc8895"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/afornerot/bNine-FilesBundle/zipball/add22ab4bd7c7342968e901294a2990b7efc8895",
+                "reference": "add22ab4bd7c7342968e901294a2990b7efc8895",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.1",
+                "symfony/framework-bundle": "^7.1"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.85"
+            },
+            "suggest": {
+                "oneup/uploader-bundle": "^4.0"
+            },
+            "type": "symfony-bundle",
+            "extra": {
+                "branch-alias": {
+                    "dev-main": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Bnine\\FilesBundle\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "afornerot",
+                    "email": "arno.nanor@gmail.com"
+                }
+            ],
+            "description": "Symfony bundle for entity-based file browser and management.",
+            "keywords": [
+                "bundle",
+                "directory",
+                "entity",
+                "file-browser",
+                "files",
+                "symfony",
+                "upload"
+            ],
+            "support": {
+                "issues": "https://github.com/afornerot/bNine-FilesBundle/issues",
+                "source": "https://github.com/afornerot/bNine-FilesBundle/tree/v1.0.6"
+            },
+            "time": "2025-08-02T11:06:27+00:00"
         },
         {
             "name": "brick/math",
@@ -11990,5 +12051,5 @@
         "ext-iconv": "*"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }

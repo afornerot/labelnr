@@ -6,6 +6,7 @@ use App\Entity\TIR;
 use App\Repository\MaturityRepository;
 use App\Repository\PARepository;
 use App\Repository\TIRRepository;
+use Bnine\FilesBundle\Service\FileService;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 
@@ -15,6 +16,7 @@ class TIRFixtures extends Fixture
         private MaturityRepository $maturityRepository,
         private PARepository $paRepository,
         private TIRRepository $tirRepository,
+        private FileService $fileService,
     ) {
     }
 
@@ -106,6 +108,7 @@ class TIRFixtures extends Fixture
                 $tir->setTitle($item['title']);
                 $tir->setPa($pa);
                 $manager->persist($tir);
+                $this->fileService->init('evidence', $tir->getId());
             }
         }
 

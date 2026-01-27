@@ -1,0 +1,42 @@
+{{level}}# {{title}}
+
+**SCORE GLOBAL = {{ score|number_format(0, '.', '') }}**
+
+{% set currentthematic = "" %}
+{% for pa in pas %}
+{% if currentthematic != pa.thematic.code %}
+
+{{level}}## {{ pa.thematic.code }} - {{ pa.thematic.title }}
+
+**Score Thématique : {{ pa.thematic.score|number_format(2, '.', '') }}**
+
+{% set currentthematic = pa.thematic.code %}
+{% endif %}
+
+{{level}}### {{ pa.code }} : {{ pa.title }}
+
+- **Score** : {{ pa.score|number_format(0, '.', '') }}
+- **Evaluation** : {% if pa.score > 749 %}Raisonnable{% elseif pa.score > 349 %}Partiel{% elseif pa.score >= 0 %}Faible{% else %}NA{% endif %}  
+- **Priorité** : {{ pa.materiality.title }}
+
+{% for tir in pa.tirs %}
+{{level}}#### {{ tir.code }} : {{ tir.title }}
+
+**Maturité** : {{ tir.maturity.value }} ({{ tir.maturity.title }})
+
+{% if tir.comment %}
+**Commentaire**
+
+{{ tir.comment|replace({"\n": "\n\n"}) }}
+{% endif %}
+
+{% if tir.dmrs|filter(d => d.type.value == 'documentation')|length > 0 %}
+**Documentation**
+
+{% for doc in tir.dmrs|filter(d => d.type.value == 'documentation') %}
+- {{ doc.comment|replace({"\n":"\n- "}) }}
+{% endfor %}
+{% endif %}
+
+{% endfor %}
+{% endfor %}
