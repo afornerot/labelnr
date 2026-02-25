@@ -38,4 +38,4 @@ services:
     container_name: labelnr-adminer
     restart: always
     ports:
-      - 6088:8080
+      - 6008:8080
