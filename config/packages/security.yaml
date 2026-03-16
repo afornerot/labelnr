@@ -29,6 +29,7 @@ security:
         path: app_logout
 
   access_control:
+    - { path: ^/rest, roles: PUBLIC_ACCESS }
     - { path: ^/login, roles: PUBLIC_ACCESS }
     - { path: ^/admin, roles: ROLE_ADMIN }
     - { path: ^/, roles: ROLE_USER }

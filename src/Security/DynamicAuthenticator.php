@@ -39,7 +39,7 @@ class DynamicAuthenticator extends AbstractAuthenticator
 
         // Exclure les routes de login et logout pour éviter les boucles
         $currentPath = $request->getPathInfo();
-        if (in_array($currentPath, ['/login', '/logout'])) {
+        if (in_array($currentPath, ['/login', '/logout', '/rest/dossier'])) {
             return false;
         }
 
