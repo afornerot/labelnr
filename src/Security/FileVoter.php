@@ -16,6 +16,11 @@ class FileVoter extends AbstractFileVoter
     protected function canView(string $domain, $id, TokenInterface $token): bool
     {
         $user = $token->getUser();
+
+        // If authenticated via API key, grant view access
+        if ($token->getUser() instanceof \Symfony\Component\Security\Core\User\InMemoryUser && in_array('ROLE_API_DOWNLOAD', $token->getRoleNames())) {
+            return true;
+        }
         if (!$user instanceof User) {
             return false;
         }

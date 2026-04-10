@@ -1,39 +1,56 @@
-{{level}}# {{title}}
+{{level}}# Synthèse
 
-**SCORE GLOBAL = {{ score|number_format(0, '.', '') }}**
+**TOTAL = {{ score|number_format(0, '.', '') }}**
 
+| Code | Libellé | Score |
+| --- | --- | ---: |
 {% set currentthematic = "" %}
 {% for pa in pas %}
 {% if currentthematic != pa.thematic.code %}
-
-{{level}}## {{ pa.thematic.code }} - {{ pa.thematic.title }}
-
-**Score Thématique : {{ pa.thematic.score|number_format(2, '.', '') }}**
-
+{% if not loop.first %}
+|  |  |  |
+{% endif %}
+| **{{ pa.thematic.code }}**| **{{ pa.thematic.title }}** | **{{ pa.thematic.score|number_format(0, '.', '') }}** |
 {% set currentthematic = pa.thematic.code %}
 {% endif %}
+| {{ pa.code }} | {{ pa.title }} | {{ pa.score|number_format(0, '.', '') }} |
+{% endfor %}
 
-{{level}}### {{ pa.code }} : {{ pa.title }}
-
-- **Score** : {{ pa.score|number_format(0, '.', '') }}
-- **Evaluation** : {% if pa.score > 749 %}Raisonnable{% elseif pa.score > 349 %}Partiel{% elseif pa.score >= 0 %}Faible{% else %}NA{% endif %}  
-- **Priorité** : {{ pa.materiality.title }}
-
+{% for pa in pas %}
 {% for tir in pa.tirs %}
-{{level}}#### {{ tir.code }} : {{ tir.title }}
+<div class='break-page'></div>
+
+{{level}}# {{ tir.code }} : {{ tir.title }}
 
 **Maturité** : {{ tir.maturity.value }} ({{ tir.maturity.title }})
 
 {% if tir.comment %}
-**Commentaire**
 
-{{ tir.comment|replace({"\n": "\n\n"}) }}
+{{ ("\n" ~ tir.comment)|replace({"\n#": "\n" ~ level ~ "#"})|replace({"\n": "\n\n"})|trim }}
 {% endif %}
+
+{{level}}## D/M/R
 
 {% if tir.dmrs|filter(d => d.type.value == 'documentation')|length > 0 %}
 **Documentation**
 
 {% for doc in tir.dmrs|filter(d => d.type.value == 'documentation') %}
+- {{ doc.comment|replace({"\n":"\n- "}) }}
+{% endfor %}
+{% endif %}
+
+{% if tir.dmrs|filter(d => d.type.value == 'moyen')|length > 0 %}
+**Moyen**
+
+{% for doc in tir.dmrs|filter(d => d.type.value == 'moyen') %}
+- {{ doc.comment|replace({"\n":"\n- "}) }}
+{% endfor %}
+{% endif %}
+
+{% if tir.dmrs|filter(d => d.type.value == 'resultat')|length > 0 %}
+**Résultat**
+
+{% for doc in tir.dmrs|filter(d => d.type.value == 'resultat') %}
 - {{ doc.comment|replace({"\n":"\n- "}) }}
 {% endfor %}
 {% endif %}

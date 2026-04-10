@@ -4,6 +4,16 @@ function ModalLoad(idmodal, title, path) {
 }
 
 $(document).ready(function () {
+	document.querySelectorAll('.markdown-raw').forEach(function (rawElement) {
+		var content = rawElement.textContent;
+		var target = rawElement.nextElementSibling;
+		if (target && content.trim().length > 0) {
+			target.innerHTML = marked.parse(content, { breaks: true, gfm: true });
+		}
+	});
+});
+
+$(document).ready(function () {
 
 	$("#selectproject").on("change", function () {
 		url = $(this).data("change");

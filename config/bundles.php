@@ -16,4 +16,5 @@ return [
     Oneup\UploaderBundle\OneupUploaderBundle::class => ['all' => true],
     Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle::class => ['dev' => true, 'test' => true],
     Bnine\FilesBundle\BnineFilesBundle::class => ['all' => true],
+    Bnine\MdEditorBundle\BnineMdEditorBundle::class => ['all' => true],
 ];

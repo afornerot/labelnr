@@ -31,3 +31,4 @@ services:
     App\Security\DynamicAuthenticator:
         arguments:
             $modeAuth: '%env(MODE_AUTH)%'
+            $urlGenerator: '@router' # Inject the router service

@@ -1561,6 +1561,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     }>,
  * }
  * @psalm-type BnineFilesConfig = array<mixed>
+ * @psalm-type BnineMdEditorConfig = array<mixed>
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,
  *     parameters?: ParametersConfig,
@@ -1576,6 +1577,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     monolog?: MonologConfig,
  *     oneup_uploader?: OneupUploaderConfig,
  *     bnine_files?: BnineFilesConfig,
+ *     bnine_md_editor?: BnineMdEditorConfig,
  *     "when@dev"?: array{
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
@@ -1594,6 +1596,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         maker?: MakerConfig,
  *         oneup_uploader?: OneupUploaderConfig,
  *         bnine_files?: BnineFilesConfig,
+ *         bnine_md_editor?: BnineMdEditorConfig,
  *     },
  *     "when@prod"?: array{
  *         imports?: ImportsConfig,
@@ -1610,6 +1613,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         monolog?: MonologConfig,
  *         oneup_uploader?: OneupUploaderConfig,
  *         bnine_files?: BnineFilesConfig,
+ *         bnine_md_editor?: BnineMdEditorConfig,
  *     },
  *     "when@test"?: array{
  *         imports?: ImportsConfig,
@@ -1627,6 +1631,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         monolog?: MonologConfig,
  *         oneup_uploader?: OneupUploaderConfig,
  *         bnine_files?: BnineFilesConfig,
+ *         bnine_md_editor?: BnineMdEditorConfig,
  *     },
  *     ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias
  *         imports?: ImportsConfig,

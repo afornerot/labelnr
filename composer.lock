@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ff7bb09b52ea466a9306065e52c5d0d5",
+    "content-hash": "6b035f2c62b13193d0ad040ef1510af2",
     "packages": [
         {
             "name": "apereo/phpcas",
@@ -137,6 +137,65 @@
                 "source": "https://github.com/afornerot/bNine-FilesBundle/tree/v1.0.6"
             },
             "time": "2025-08-02T11:06:27+00:00"
+        },
+        {
+            "name": "bnine/mdeditorbundle",
+            "version": "v1.1.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/afornerot/bNine-MdEditorBundle.git",
+                "reference": "ab56ca3601145d2a393160546a534eac9be33cf5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/afornerot/bNine-MdEditorBundle/zipball/ab56ca3601145d2a393160546a534eac9be33cf5",
+                "reference": "ab56ca3601145d2a393160546a534eac9be33cf5",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.1",
+                "symfony/framework-bundle": "^7.1"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.85"
+            },
+            "suggest": {
+                "oneup/uploader-bundle": "^4.0"
+            },
+            "type": "symfony-bundle",
+            "extra": {
+                "branch-alias": {
+                    "dev-main": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Bnine\\MdEditorBundle\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "afornerot",
+                    "email": "arno.nanor@gmail.com"
+                }
+            ],
+            "description": "Symfony bundle for entity-based file browser and management.",
+            "keywords": [
+                "bundle",
+                "editor",
+                "entity",
+                "markdown",
+                "symfony"
+            ],
+            "support": {
+                "issues": "https://github.com/afornerot/bNine-MdEditorBundle/issues",
+                "source": "https://github.com/afornerot/bNine-MdEditorBundle/tree/v1.1.5"
+            },
+            "time": "2025-08-04T17:34:17+00:00"
         },
         {
             "name": "brick/math",

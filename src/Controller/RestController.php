@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Repository\PARepository;
 use App\Repository\ThematicRepository;
 use App\Repository\TIRRepository;
+use App\Repository\WeeklyRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -16,10 +17,33 @@ class RestController extends AbstractController
 {
     public function __construct(
         private readonly ThematicRepository $thematicRepository,
+        private readonly WeeklyRepository $weeklyRepository,
         private readonly PARepository $paRepository,
         private readonly TIRRepository $tirRepository,
         private readonly ParameterBagInterface $params,
     ) {
+    }
+
+    #[Route('/rest/weekly', name: 'app_api_rest_weekly', methods: ['GET'])]
+    public function getWeekly(Request $request): JsonResponse
+    {
+        $apiKey = $request->query->get('apikey');
+        $appSecret = $this->params->get('appSecret');
+
+        if ($apiKey !== $appSecret) {
+            return $this->json(['message' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
+        }
+
+        $weeklys = $this->weeklyRepository->findBy([], ['date' => 'ASC']);
+        $return = [];
+        foreach ($weeklys as $weekly) {
+            $return[] = [
+                'date' => $weekly->getDate()->format('Y-m-d'),
+                'nbHour' => $weekly->getNbHour(),
+            ];
+        }
+
+        return $this->json($return);
     }
 
     #[Route('/rest/dossier', name: 'app_api_rest_dossier', methods: ['GET'])]
