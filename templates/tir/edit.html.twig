@@ -1,0 +1,188 @@
+{% extends 'base.html.twig' %}
+
+{% block localstyle %}
+<style>
+    .tir-header {
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+    
+    .tir-code {
+        font-size: 2em;
+        font-weight: bold;
+    }
+    
+    .tir-title {
+        font-size: 1.5em;
+        margin-bottom: 10px;
+    }
+    
+    .dmr-item {
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 4px;
+        border: 1px solid var(--bs-border-color);
+        position: relative;
+    }
+    
+    .dmr-item .btn-group {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="tir-header">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="tir-code">{{ tir.code }}</div>
+                        <div class="tir-title">{{ tir.title }}</div>
+                    </div>
+                    <div>
+                        <a href="{{ path('app_tir_show', {id: tir.id}) }}" class="btn btn-secondary">
+                            <i class="fas fa-eye"></i> Voir
+                        </a>
+                        <a href="{{ path('app_home', {scrollToTir: tir.id}) }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i> Retour
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">PA - {{ tir.pa.code }}</h5>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>{{ tir.pa.title }}</strong></p>
+                            <p class="mb-0">
+                                <span class="badge bg-primary">Score: {{ tir.pa.score }}</span>
+                                <span class="badge bg-secondary">Priorité: {{ tir.pa.materiality.title }}</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Modifier la maturité</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" action="{{ path('app_tir_edit_maturity', {id: tir.id}) }}">
+                                <div class="d-flex gap-2">
+                                    <select name="maturityId" class="form-select">
+                                        {% for maturity in maturitys %}
+                                            <option value="{{ maturity.id }}" {% if maturity.id == tir.maturity.id %}selected{% endif %}>
+                                                {{ maturity.title }} ({{ maturity.value }})
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% if tir.description %}
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h5 class="mb-0">Description</h5>
+                    </div>
+                    <div class="card-body">
+                        {{ tir.description|nl2br }}
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5 class="mb-0">Commentaire</h5>
+                </div>
+                <div class="card-body">
+                    {{ form_start(commentForm, {'attr': {'novalidate': 'novalidate'}}) }}
+                        {{ form_widget(commentForm.comment) }}
+                        {{ form_widget(commentForm.save) }}
+                    {{ form_end(commentForm) }}
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5 class="mb-0">DMR</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for typeName, dmrForm in dmrForms %}
+                            <div class="col-md-4">
+                                <h5 class="mb-3">{{ typeName|capitalize }}</h5>
+                                
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        {{ form_start(dmrForm) }}
+                                            {{ form_widget(dmrForm.comment) }}
+                                            <input type="hidden" name="type" value="{{ typeName }}">
+                                            {{ form_widget(dmrForm.save) }}
+                                        {{ form_end(dmrForm) }}
+                                    </div>
+                                </div>
+                                
+                                {% for dmr in tir.dmrs|filter(d => d.type.value == typeName) %}
+                                    <div class="dmr-item">
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editDmrModal{{ dmr.id }}">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <form method="post" action="{{ path('app_dmr_delete', {dmrId: dmr.id}) }}" onsubmit="return confirm('Supprimer cet élément ?')" class="d-inline">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                        {{ dmr.comment|nl2br }}
+                                    </div>
+                                    
+                                    <div class="modal fade" id="editDmrModal{{ dmr.id }}" tabindex="-1">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Modifier {{ typeName|capitalize }}</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                {{ form_start(editDmrForms[dmr.id]) }}
+                                                    <div class="modal-body">
+                                                        {{ form_widget(editDmrForms[dmr.id].comment) }}
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                                                        {{ form_widget(editDmrForms[dmr.id].save) }}
+                                                    </div>
+                                                {{ form_end(editDmrForms[dmr.id]) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <p class="text-muted">Aucun élément</p>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                {{ render(path("bninefiles_files", {domain: 'evidence', id: tir.id, editable: 1})) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

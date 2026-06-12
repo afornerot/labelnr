@@ -3,8 +3,19 @@
 {% block localstyle %}
 <style>
     verysmall { zoom:70%; }
-
     big { zoom: 130%; }
+
+    table h1, {
+        font-size: 2rem;
+    }
+    table h2 {
+        font-size: 1.7rem;
+        border-bottom: 1px solid #f8f9fa;
+    }
+
+    table h3 {
+        font-size: 1.4rem;
+    }
 
     surline {
         background-color: #fff;
@@ -14,8 +25,6 @@
         font-weight: bold;
         zoom: 130%;
     }
-
-    #table-container { transition: opacity 0.3s ease; }
 
     .btn-collapse:hover {
         background-color: #f8f9fa !important;
@@ -33,390 +42,133 @@
     .btn-collapse[aria-expanded="true"]::after {
         transform: rotate(180deg);
     }
-
-    .textarea-comment {
-        min-height: calc(3em + 0.75rem + 2px);
-    }
 </style>
 {% endblock %}
 
 {% block body %}
-    {# On inclut le fragment pour le premier affichage au chargement de la page #}
     {% include 'home/table.html.twig' %}
-
-    <div class="modal fade" id="dmrModal" tabindex="-1" role="dialog" aria-labelledby="dmrModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="dmrModalLabel">Ajouter un élément</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form id="dmrForm">
-                    <div class="modal-body">
-                        <input type="hidden" id="dmrTirId" name="tirId">
-                        <input type="hidden" id="dmrType" name="type">
-                        <input type="hidden" id="dmrId" name="dmrId">
-                        <div class="form-group">
-                            <label for="dmrComment">Commentaire</label>
-                            <textarea class="form-control" id="dmrComment" name="comment" rows="4" required></textarea>
-                        </div>
-                    </div>
-                    <div class="modal-footer justify-content-between">
-                        <div>
-                            <button type="button" class="btn btn-danger" id="deleteDmrBtn" style="display: none;">Supprimer</button>
-                        </div>
-                        <div>
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                            <button type="submit" class="btn btn-primary">Enregistrer</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 {% endblock %}
 
 {% block localscript %}
 <script>
-    // --- Fonctions utilitaires de redimensionnement et d'état ---
+(function() {
+    var STORAGE_KEY_PA = 'labelnr_pa_open';
+    var STORAGE_KEY_TIR = 'labelnr_tir_open';
 
-    function autosize(textarea) {
-        textarea.style.height = 'auto';
-        textarea.style.height = textarea.scrollHeight + 10 + 'px';
+    function getOpen(key) {
+        try { return JSON.parse(localStorage.getItem(key)) || []; } catch(e) { return []; }
     }
 
-    function initializeAutosize() {
-        $('.textarea-comment:visible').each(function() {
-            autosize(this);
-        });
+    function setOpen(key, arr) {
+        localStorage.setItem(key, JSON.stringify(arr));
     }
 
-    function saveCollapseState() {
-        var openIds = [];
-        $('.collapse.show').each(function() {
-            openIds.push($(this).attr('id'));
-        });
-        localStorage.setItem('openedCollapses', JSON.stringify(openIds));
-    }
-
-    function restoreCollapseState() {
-        var stored = localStorage.getItem('openedCollapses');
-        if (stored) {
-            var openIds = JSON.parse(stored);
-            openIds.forEach(function(id) {
-                var $target = $('#' + id);
-                if ($target.length) {
-                    $target.addClass('show');
-                    $(`[data-bs-target="#${id}"]`).attr('aria-expanded', 'true');
-                }
-            });
+    function toggleItem(key, id, isOpen) {
+        var arr = getOpen(key);
+        if (isOpen) {
+            if (arr.indexOf(id) === -1) arr.push(id);
+        } else {
+            arr = arr.filter(function(v) { return v !== id; });
         }
+        setOpen(key, arr);
     }
 
-    // Libère le verrou de défilement de la page parfois laissé par l'ancienne instance détruite en plein écran
-    function nettoyerVerrousDefilement() {
-        document.body.style.overflow = 'auto';
-        document.documentElement.style.overflow = 'auto';
-        document.body.classList.remove('editor-fullscreen');
-    }
-
-    // --- Gestion et Initialisation d'EasyMDE ---
-
-    // Variable globale pour stocker l'état visuel de l'éditeur actif avant l'écrasement du DOM par l'AJAX
-    let etatEditeurPrecedent = null;
-
-    function initializeEasyMDE() {
-        // Sécurité : On nettoie le scroll de la page à chaque reconstruction du tableau
-        nettoyerVerrousDefilement();
-
-        document.querySelectorAll('.textarea-comment').forEach(function (textarea, index) {
-            // Sécurité : On n'initialise pas si EasyMDE est déjà présent sur ce textarea
-            if (textarea.style.display === 'none' || textarea.nextSibling?.classList?.contains('EasyMDEContainer')) {
-                return;
+    function restorePa() {
+        var open = getOpen(STORAGE_KEY_PA);
+        open.forEach(function(code) {
+            var el = document.getElementById('collapse-' + code);
+            if (el && !el.classList.contains('show')) {
+                el.classList.add('show');
             }
-
-            const height = textarea.dataset.markdownHeight;
-            const currentTirId = textarea.getAttribute('data-tir-id') || $(textarea).data('tir-id');
-
-            const mdeInstance = new EasyMDE({
-                element: textarea,
-                spellChecker: false,
-                status: false,
-                minHeight: height ? `${height}px` : undefined,
-                autosave: { enabled: false },
-                toolbar: [
-                    "bold", "italic", "heading", "|", 
-                    "quote", "unordered-list", "ordered-list", "|", 
-                    "link", "image", "|", 
-                    "preview", "side-by-side", "fullscreen", "|",
-                    {
-                        name: "save",
-                        action: function customSave(editor) {
-                            // Si un mode d'affichage spécial est actif, on enregistre sa configuration
-                            if (editor.isFullscreenActive() || editor.isSideBySideActive()) {
-                                etatEditeurPrecedent = {
-                                    tirId: currentTirId,
-                                    fullscreen: editor.isFullscreenActive(),
-                                    sideBySide: editor.isSideBySideActive()
-                                };
-                            }
-
-                            // 1. Force la synchronisation avec le textarea d'origine
-                            editor.toTextArea(); 
-
-                            // 2. Déclenche manuellement l'événement change sur le textarea d'origine pour lancer l'AJAX
-                            editor.element.dispatchEvent(new Event('change', { bubbles: true }));
-                            console.log("Sauvegarde déclenchée via le bouton disquette.");
-                        },
-                        className: "fa fa-floppy-o", // Icône de disquette Font Awesome
-                        title: "Enregistrer le commentaire", // Texte au survol
-                    }
-                ]
-            });
-
-            // Sauvegarde de l'instance EasyMDE directement sur l'élément du DOM natif au besoin
-            textarea.easyMDEInstance = mdeInstance;
-
-            // Variable locale pour stocker la valeur initiale au moment du focus dedans
-            let valeurInitiale = "";
-
-            mdeInstance.codemirror.on("focus", function () {
-                valeurInitiale = mdeInstance.value();
-            });
-
-            mdeInstance.codemirror.on("blur", function () {
-                const valeurActuelle = mdeInstance.value();
-
-                // On ne déclenche la suite QUE si le texte a réellement changé
-                if (valeurActuelle !== valeurInitiale) {
-                    console.log("Changement réel détecté pour le tir-id " + currentTirId);
-
-                    // Si le blur se produit pendant qu'un mode plein écran/scindé est actif
-                    if (mdeInstance.isFullscreenActive() || mdeInstance.isSideBySideActive()) {
-                        etatEditeurPrecedent = {
-                            tirId: currentTirId,
-                            fullscreen: mdeInstance.isFullscreenActive(),
-                            sideBySide: mdeInstance.isSideBySideActive()
-                        };
-                    }
-
-                    // Met à jour le textarea d'origine
-                    mdeInstance.toTextArea(); 
-
-                    // Déclenche le 'change' qui va activer le script jQuery AJAX
-                    textarea.dispatchEvent(new Event('change', { bubbles: true }));
-                } else {
-                    console.log("Sortie de l'éditeur sans modification (pas d'AJAX).");
-                }
-            });
-
-            // Sécurité : Si l'utilisateur quitte le mode plein écran à la main (ex: touche Échap)
-            mdeInstance.codemirror.on("fullscreenHide", function() {
-                nettoyerVerrousDefilement();
-            });
-
-            // RESTAURATION DES MODES : Si cet éditeur correspond à l'état sauvegardé juste avant l'AJAX
-            if (etatEditeurPrecedent && String(etatEditeurPrecedent.tirId) === String(currentTirId)) {
-                setTimeout(function() {
-                    if (etatEditeurPrecedent.fullscreen && !mdeInstance.isFullscreenActive()) {
-                        mdeInstance.toggleFullScreen();
-                    }
-                    if (etatEditeurPrecedent.sideBySide && !mdeInstance.isSideBySideActive()) {
-                        mdeInstance.toggleSideBySide();
-                    }
-
-                    mdeInstance.codemirror.focus();
-                    etatEditeurPrecedent = null; // Reset de la mémoire de l'état
-                }, 50);
-            }
+            var trigger = document.querySelector('[data-bs-target="#collapse-' + code + '"]');
+            if (trigger) trigger.setAttribute('aria-expanded', 'true');
         });
     }
 
-    // --- Rituels au chargement et Écouteurs d'événements jQuery ---
-
-    $(document).ready(function() {
-        restoreCollapseState();
-        initializeAutosize();
-        initializeEasyMDE();    
-
-        $(document).on('shown.bs.collapse', '.collapse', function () {
-            saveCollapseState();
-            $(this).find('.textarea-comment').each(function() {
-                autosize(this);
-            });
-        });
-
-        $(document).on('hidden.bs.collapse', '.collapse', function () {
-            saveCollapseState();
-        });
-
-        $(document).on('input', '.textarea-comment', function() {
-            autosize(this);
-        });
-
-        // Modification de la maturité
-        $(document).on('change', '.select-maturity', function() {
-            const $select = $(this);
-            const data = {
-                tirId: $select.data('tir-id'),
-                maturityId: $select.val()
-            };
-
-            $('#table-container').css('opacity', 0.5);
-
-            $.ajax({
-                url: "{{ path('app_tir_updatematurity') }}",
-                method: 'POST',
-                data: data,
-                success: function(response) {
-                    $('#table-container').replaceWith(response);
-                    restoreCollapseState();
-                    initializeEasyMDE(); // Réinitialise EasyMDE sur le nouveau HTML reçu
-                    setTimeout(initializeAutosize, 1);
-                },
-                error: function() {
-                    alert("Erreur lors de la mise à jour des données.");
-                    $('#table-container').css('opacity', 1);
-                }
-            });
-        });
-
-        // Sauvegarde AJAX du commentaire (Déclenché par notre dispatchEvent)
-        $(document).on('change', '.textarea-comment', function() {
-            console.log("Changement détecté dans un textarea-comment");
-            const $textarea = $(this);
-            const data = {
-                tirId: $textarea.data('tir-id'),
-                comment: $textarea.val()
-            };
-
-            $('#table-container').css('opacity', 0.5);
-
-            $.ajax({
-                url: "{{ path('app_tir_updatecomment') }}",
-                method: 'POST',
-                data: data,
-                success: function(response) {
-                    // Remplace le DOM (ce qui détruit les anciennes instances d'EasyMDE)
-                    $('#table-container').replaceWith(response);
-                    
-                    restoreCollapseState();
-                    
-                    // La réinitialisation va intercepter l'objet "etatEditeurPrecedent" s'il existe et le restaurer
-                    initializeEasyMDE();
-                                        
-                    setTimeout(initializeAutosize, 1);
-                },
-                error: function() {
-                    alert("Erreur lors de la mise à jour du commentaire.");
-                    $('#table-container').css('opacity', 1);
-                    etatEditeurPrecedent = null; // Nettoyage de l'état en cas d'échec
-                }
-            });
-        });
-
-        // --- Gestion de la modale DMR ---
-
-        $('#dmrModal').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget);
-            var modal = $(this);
-            var deleteBtn = modal.find('#deleteDmrBtn');
-            
-            modal.find('#dmrId').val('');
-            modal.find('#dmrTirId').val('');
-            modal.find('#dmrType').val('');
-            modal.find('#dmrComment').val('');
-            deleteBtn.hide();
-
-            if (button.data('dmr-id')) {
-                var dmrId = button.data('dmr-id');
-                var comment = button.html().replace(/<br\s*\/?>/gi, "\n");
-                
-                modal.find('.modal-title').text('Modifier l\'élément');
-                modal.find('#dmrId').val(dmrId);
-                modal.find('#dmrComment').val(comment);
-                deleteBtn.show();
-            } else {
-                var tirId = button.data('tir-id');
-                var dmrType = button.data('dmr-type');
-                var typeText = dmrType.charAt(0).toUpperCase() + dmrType.slice(1);
-
-                modal.find('.modal-title').text('Ajouter : ' + typeText);
-                modal.find('#dmrTirId').val(tirId);
-                modal.find('#dmrType').val(dmrType);
+    function restoreTir() {
+        var open = getOpen(STORAGE_KEY_TIR);
+        open.forEach(function(id) {
+            var el = document.getElementById('collapse-tir-' + id);
+            if (el && !el.classList.contains('show')) {
+                el.classList.add('show');
             }
-            
+            var trigger = document.querySelector('[data-bs-target="#collapse-tir-' + id + '"]');
+            if (trigger) trigger.setAttribute('aria-expanded', 'true');
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        restorePa();
+        restoreTir();
+
+        document.querySelectorAll('.collapse-pa').forEach(function(el) {
+            var code = el.id.replace('collapse-', '');
+            el.addEventListener('shown.bs.collapse', function() {
+                toggleItem(STORAGE_KEY_PA, code, true);
+            });
+            el.addEventListener('hidden.bs.collapse', function() {
+                toggleItem(STORAGE_KEY_PA, code, false);
+            });
+        });
+
+        document.querySelectorAll('.collapse-tir').forEach(function(el) {
+            var tirId = el.id.replace('collapse-tir-', '');
+            el.addEventListener('shown.bs.collapse', function() {
+                toggleItem(STORAGE_KEY_TIR, tirId, true);
+            });
+            el.addEventListener('hidden.bs.collapse', function() {
+                toggleItem(STORAGE_KEY_TIR, tirId, false);
+            });
+        });
+
+        var params = new URLSearchParams(window.location.search);
+        var scrollTo = params.get('scrollToTir');
+        if (scrollTo) {
+            var tirEl = document.getElementById('collapse-tir-' + scrollTo);
+            var paEl = tirEl ? tirEl.closest('.collapse-pa') : null;
+            if (paEl && !paEl.classList.contains('show')) {
+                paEl.classList.add('show');
+                var paCode = paEl.id.replace('collapse-', '');
+                toggleItem(STORAGE_KEY_PA, paCode, true);
+                var paTrigger = document.querySelector('[data-bs-target="#collapse-' + paCode + '"]');
+                if (paTrigger) paTrigger.setAttribute('aria-expanded', 'true');
+            }
+            if (tirEl && !tirEl.classList.contains('show')) {
+                tirEl.classList.add('show');
+                toggleItem(STORAGE_KEY_TIR, scrollTo, true);
+                var tirTrigger = document.querySelector('[data-bs-target="#collapse-tir-' + scrollTo + '"]');
+                if (tirTrigger) tirTrigger.setAttribute('aria-expanded', 'true');
+            }
             setTimeout(function() {
-                modal.find('#dmrComment').focus();
-            }, 500);
-        });
+                var trigger = document.querySelector('[data-bs-target="#collapse-tir-' + scrollTo + '"]');
+                if (trigger) trigger.scrollIntoView({behavior: 'smooth', block: 'center'});
+            }, 100);
+            window.history.replaceState({}, '', window.location.pathname);
+        }
 
-        $('#dmrForm').on('submit', function(e) {
-            e.preventDefault();
-
-            const $form = $(this);
-            const data = $form.serialize();
-            const dmrId = $form.find('#dmrId').val();
-            
-            const url = dmrId ? "{{ path('app_tir_updatedmr') }}" : "{{ path('app_tir_submitdmr') }}";
-
-            $('#table-container').css('opacity', 0.5);
-            $('#dmrModal').modal('hide');
-
-            $.ajax({
-                url: url,
-                method: 'POST',
-                data: data,
-                success: function(response) {
-                    $('#table-container').replaceWith(response);
-                    restoreCollapseState();
-                    initializeEasyMDE(); // Réinitialise EasyMDE sur le nouveau HTML reçu
-                    setTimeout(initializeAutosize, 1);
-                },
-                error: function() {
-                    alert("Erreur lors de l'enregistrement.");
-                    $('#table-container').css('opacity', 1);
+        document.querySelectorAll('.btn-toggle-all').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var target = btn.getAttribute('data-target');
+                var action = btn.getAttribute('data-action');
+                var show = action === 'show';
+                document.querySelectorAll(target).forEach(function(el) {
+                    var bsInstance = bootstrap.Collapse.getOrCreateInstance(el, {toggle: false});
+                    if (show) {
+                        bsInstance.show();
+                    } else {
+                        bsInstance.hide();
+                    }
+                });
+                if (target === '.collapse-pa') {
+                    var open = show ? Array.from(document.querySelectorAll('.collapse-pa')).map(function(el) { return el.id.replace('collapse-', ''); }) : [];
+                    setOpen(STORAGE_KEY_PA, open);
+                } else if (target === '.collapse-tir') {
+                    var open = show ? Array.from(document.querySelectorAll('.collapse-tir')).map(function(el) { return el.id.replace('collapse-tir-', ''); }) : [];
+                    setOpen(STORAGE_KEY_TIR, open);
                 }
             });
         });
-
-        $('#deleteDmrBtn').on('click', function() {
-            if (!confirm("Êtes-vous sûr de vouloir supprimer cet élément ?")) {
-                return;
-            }
-
-            const dmrId = $('#dmrId').val();
-            if (!dmrId) {
-                alert('Erreur : ID de l\'élément non trouvé.');
-                return;
-            }
-
-            $('#table-container').css('opacity', 0.5);
-            $('#dmrModal').modal('hide');
-
-            $.ajax({
-                url: "{{ path('app_tir_deletedmr') }}",
-                method: 'POST',
-                data: { dmrId: dmrId },
-                success: function(response) {
-                    $('#table-container').replaceWith(response);
-                    restoreCollapseState();
-                    initializeEasyMDE(); // Réinitialise EasyMDE sur le nouveau HTML reçu
-                    setTimeout(initializeAutosize, 1);
-                },
-                error: function() {
-                    alert("Erreur lors de la suppression de l'élément.");
-                    $('#table-container').css('opacity', 1);
-                }
-            });
-        });
-
-        $(document).on('click', '.btn-toggle-all', function() {
-            var target = $(this).data('target');
-            var action = $(this).data('action');
-            $(target).collapse(action);
-        });
-        
     });
+})();
 </script>
 {% endblock %}

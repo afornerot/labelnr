@@ -23,7 +23,7 @@ class PAFixtures extends Fixture
         $data = [
             ['thematic' => '1', 'materiality' => '003', 'code' => 'PA01', 'title' => 'Intégrer le Numérique Responsable (NR) dans la stratégie de l\'organisation'],
             ['thematic' => '1', 'materiality' => '003', 'code' => 'PA02', 'title' => 'Formaliser sa politique numérique responsable'],
-            ['thematic' => '1', 'materiality' => '003', 'code' => 'PA03', 'title' => 'Déployer sa politique "numérique responsable'],
+            ['thematic' => '1', 'materiality' => '003', 'code' => 'PA03', 'title' => 'Déployer sa politique "numérique responsable"'],
 
             ['thematic' => '2', 'materiality' => '002', 'code' => 'PA04', 'title' => 'Animer la démarche pour faire adhérer les parties prenantes internes et externes'],
             ['thematic' => '2', 'materiality' => '002', 'code' => 'PA05', 'title' => 'Intégrer l\'accessibilité numérique'],
