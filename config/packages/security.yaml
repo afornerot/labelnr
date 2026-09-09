@@ -8,16 +8,27 @@ security:
         class: App\Entity\User
         property: username
 
+    in_memory_provider:
+      memory:
+        users: []
+
   firewalls:
     dev:
-      pattern: ^/(_(profiler|wdt)|css|images|js)/
+      pattern: ^/(_(profiler|wdt)|css|images|js|lib)/
       security: false
+
+    share:
+      pattern: ^/share/
+      provider: in_memory_provider
+      custom_authenticators:
+        - App\Security\ShareTokenAuthenticator
 
     main:
       pattern: ^/
       provider: sql_provider
       custom_authenticators:
         - App\Security\DynamicAuthenticator
+        - App\Security\ShareTokenAuthenticator
       form_login:
         login_path: app_login
         check_path: app_login
@@ -32,6 +43,7 @@ security:
     - { path: ^/rest, roles: PUBLIC_ACCESS }
     - { path: ^/api, roles: PUBLIC_ACCESS }
     - { path: ^/login, roles: PUBLIC_ACCESS }
+    - { path: ^/share/, roles: PUBLIC_ACCESS }
     - { path: ^/admin, roles: ROLE_ADMIN }
     - { path: ^/, roles: ROLE_USER }
 

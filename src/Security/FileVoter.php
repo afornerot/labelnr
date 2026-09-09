@@ -9,18 +9,23 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class FileVoter extends AbstractFileVoter
 {
-    public function __construct(private TIRRepository $tirRepository)
-    {
+    public function __construct(
+        private TIRRepository $tirRepository,
+    ) {
     }
 
     protected function canView(string $domain, $id, TokenInterface $token): bool
     {
         $user = $token->getUser();
 
-        // If authenticated via API key, grant view access
-        if ($token->getUser() instanceof \Symfony\Component\Security\Core\User\InMemoryUser && in_array('ROLE_API_DOWNLOAD', $token->getRoleNames())) {
+        if ($user instanceof \Symfony\Component\Security\Core\User\InMemoryUser && in_array('ROLE_API_DOWNLOAD', $token->getRoleNames())) {
             return true;
         }
+
+        if ($user instanceof \Symfony\Component\Security\Core\User\InMemoryUser && in_array('ROLE_SHARE', $token->getRoleNames())) {
+            return true;
+        }
+
         if (!$user instanceof User) {
             return false;
         }

@@ -5,36 +5,33 @@ namespace App\Controller;
 use App\Repository\MaterialityRepository;
 use App\Repository\PARepository;
 use App\Repository\ThematicRepository;
+use App\Service\ShareTokenService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 
-class HomeController extends AbstractController
+class ShareController extends AbstractController
 {
     public function __construct(
+        private readonly ShareTokenService $shareTokenService,
         private readonly ThematicRepository $thematicRepository,
         private readonly PARepository $paRepository,
         private readonly MaterialityRepository $materialityRepository,
     ) {
     }
 
-    #[Route('/', name: 'app_home')]
-    public function home(): Response
+    #[Route('/share/{token}', name: 'app_share_view')]
+    public function view(string $token, Request $request): Response
     {
-        return $this->renderTableFragment('home/home.html.twig');
-    }
+        $shareToken = $this->shareTokenService->validateToken($token);
 
-    #[Route('/admin', name: 'app_admin')]
-    public function admin(): Response
-    {
-        return $this->render('home/blank.html.twig', [
-            'usemenu' => true,
-            'usesidebar' => true,
-        ]);
-    }
+        if (!$shareToken) {
+            throw $this->createNotFoundException('Lien de partage invalide ou expiré.');
+        }
 
-    private function renderTableFragment(string $template): Response
-    {
+        $request->getSession()->set('_share_token', $token);
+
         $thematics = $this->thematicRepository->findAll();
         $pas = $this->paRepository->findAll();
         $materialities = $this->materialityRepository->findAll();
@@ -48,12 +45,15 @@ class HomeController extends AbstractController
 
         $score = $count > 0 ? $total / $count : 0;
 
-        return $this->render($template, [
+        return $this->render('share/index.html.twig', [
             'pas' => $pas,
             'score' => $score,
             'materialities' => $materialities,
-            'usemenu' => true,
+            'usemenu' => false,
             'usesidebar' => false,
+            'shareLabel' => $shareToken->getLabel(),
+            'shareToken' => $token,
+            'readOnly' => true,
         ]);
     }
 }

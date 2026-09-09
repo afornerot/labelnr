@@ -36,20 +36,20 @@ class DynamicAuthenticator extends AbstractAuthenticator
 
     public function supports(Request $request): ?bool
     {
-        // Vérifie si l'utilisateur est déjà connecté
         if ($request->getSession()->get('_security_main')) {
-            return false; // L'utilisateur est déjà authentifié
+            return false;
         }
 
-        // Check for API key for file downloads
-        // We need to check the route name to apply this logic only to bninefiles_files_download
+        if ($request->getSession()->has('_share_token')) {
+            return false;
+        }
+
         if ($request->query->has('appSecret') && 'bninefiles_files_download' === $request->attributes->get('_route')) {
-            return true; // This authenticator will handle it
+            return true;
         }
 
-        // Exclure les routes de login et logout pour éviter les boucles
         $currentPath = $request->getPathInfo();
-        if (in_array($currentPath, ['/login', '/logout', '/rest/dossier', '/rest/weekly', '/api/print'])) {
+        if (in_array($currentPath, ['/login', '/logout', '/rest/dossier', '/rest/weekly', '/api/print', '/share/'])) {
             return false;
         }
 
@@ -58,13 +58,11 @@ class DynamicAuthenticator extends AbstractAuthenticator
 
     public function authenticate(Request $request): Passport
     {
-        // Handle API key authentication for file downloads
         if ($request->query->has('appSecret') && 'bninefiles_files_download' === $request->attributes->get('_route')) {
             $providedSecret = $request->query->get('appSecret');
             $appSecret = $this->parameterBag->get('appSecret');
 
             if ($providedSecret === $appSecret) {
-                // Create a "dummy" user for API access with a specific role
                 $apiUser = new InMemoryUser('api_user', null, ['ROLE_API_DOWNLOAD']);
 
                 return new SelfValidatingPassport(new UserBadge($apiUser->getUserIdentifier(), fn () => $apiUser));

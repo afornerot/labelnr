@@ -10,7 +10,7 @@
     }
     table h2 {
         font-size: 1.7rem;
-        border-bottom: 1px solid #f8f9fa;
+        border-bottom: 1px solid #f89fa;
     }
 
     table h3 {
@@ -46,7 +46,7 @@
 {% endblock %}
 
 {% block body %}
-    {% include 'home/table.html.twig' %}
+    {% include 'home/table.html.twig' with {shareLabel: shareLabel, readOnly: readOnly} %}
 {% endblock %}
 
 {% block localscript %}
@@ -121,31 +121,6 @@
                 toggleItem(STORAGE_KEY_TIR, tirId, false);
             });
         });
-
-        var params = new URLSearchParams(window.location.search);
-        var scrollTo = params.get('scrollToTir');
-        if (scrollTo) {
-            var tirEl = document.getElementById('collapse-tir-' + scrollTo);
-            var paEl = tirEl ? tirEl.closest('.collapse-pa') : null;
-            if (paEl && !paEl.classList.contains('show')) {
-                paEl.classList.add('show');
-                var paCode = paEl.id.replace('collapse-', '');
-                toggleItem(STORAGE_KEY_PA, paCode, true);
-                var paTrigger = document.querySelector('[data-bs-target="#collapse-' + paCode + '"]');
-                if (paTrigger) paTrigger.setAttribute('aria-expanded', 'true');
-            }
-            if (tirEl && !tirEl.classList.contains('show')) {
-                tirEl.classList.add('show');
-                toggleItem(STORAGE_KEY_TIR, scrollTo, true);
-                var tirTrigger = document.querySelector('[data-bs-target="#collapse-tir-' + scrollTo + '"]');
-                if (tirTrigger) tirTrigger.setAttribute('aria-expanded', 'true');
-            }
-            setTimeout(function() {
-                var trigger = document.querySelector('[data-bs-target="#collapse-tir-' + scrollTo + '"]');
-                if (trigger) trigger.scrollIntoView({behavior: 'smooth', block: 'center'});
-            }, 100);
-            window.history.replaceState({}, '', window.location.pathname);
-        }
 
         document.querySelectorAll('.btn-toggle-all').forEach(function(btn) {
             btn.addEventListener('click', function() {
