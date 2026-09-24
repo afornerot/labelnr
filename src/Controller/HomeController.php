@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\ActionPlanRepository;
 use App\Repository\MaterialityRepository;
 use App\Repository\PARepository;
 use App\Repository\ThematicRepository;
@@ -15,6 +16,7 @@ class HomeController extends AbstractController
         private readonly ThematicRepository $thematicRepository,
         private readonly PARepository $paRepository,
         private readonly MaterialityRepository $materialityRepository,
+        private readonly ActionPlanRepository $actionPlanRepository,
     ) {
     }
 
@@ -38,6 +40,19 @@ class HomeController extends AbstractController
         $thematics = $this->thematicRepository->findAll();
         $pas = $this->paRepository->findAll();
         $materialities = $this->materialityRepository->findAll();
+        $actionPlans = $this->actionPlanRepository->findAll();
+
+        $groupedPas = [];
+        foreach ($pas as $pa) {
+            $thematicCode = $pa->getThematic()->getCode();
+            if (!isset($groupedPas[$thematicCode])) {
+                $groupedPas[$thematicCode] = [
+                    'thematic' => $pa->getThematic(),
+                    'pas' => [],
+                ];
+            }
+            $groupedPas[$thematicCode]['pas'][] = $pa;
+        }
 
         $total = 0;
         $count = 0;
@@ -49,9 +64,10 @@ class HomeController extends AbstractController
         $score = $count > 0 ? $total / $count : 0;
 
         return $this->render($template, [
-            'pas' => $pas,
+            'groupedPas' => $groupedPas,
             'score' => $score,
             'materialities' => $materialities,
+            'actionPlans' => $actionPlans,
             'usemenu' => true,
             'usesidebar' => false,
         ]);

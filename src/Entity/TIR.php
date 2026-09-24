@@ -32,6 +32,12 @@ class TIR
     #[ORM\OneToMany(targetEntity: DMR::class, mappedBy: 'tir', orphanRemoval: true)]
     private Collection $dmrs;
 
+    /**
+     * @var Collection<int, ActionPlan>
+     */
+    #[ORM\ManyToMany(targetEntity: ActionPlan::class, mappedBy: 'tirs')]
+    private Collection $actionPlans;
+
     #[ORM\Column(length: 10, unique: true)]
     private ?string $code = null;
 
@@ -50,6 +56,7 @@ class TIR
     public function __construct()
     {
         $this->dmrs = new ArrayCollection();
+        $this->actionPlans = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -107,6 +114,30 @@ class TIR
                 $dmr->setTir(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ActionPlan>
+     */
+    public function getActionPlans(): Collection
+    {
+        return $this->actionPlans;
+    }
+
+    public function addActionPlan(ActionPlan $actionPlan): static
+    {
+        if (!$this->actionPlans->contains($actionPlan)) {
+            $this->actionPlans->add($actionPlan);
+        }
+
+        return $this;
+    }
+
+    public function removeActionPlan(ActionPlan $actionPlan): static
+    {
+        $this->actionPlans->removeElement($actionPlan);
 
         return $this;
     }

@@ -55,6 +55,7 @@
     var STORAGE_KEY_PA = 'labelnr_pa_open';
     var STORAGE_KEY_TIR = 'labelnr_tir_open';
     var STORAGE_KEY_PRIORITY = 'labelnr_priority_filter';
+    var STORAGE_KEY_MATURITY = 'labelnr_maturity_filter';
 
     function getOpen(key) {
         try { return JSON.parse(localStorage.getItem(key)) || []; } catch(e) { return []; }
@@ -95,6 +96,63 @@
             }
             var trigger = document.querySelector('[data-bs-target="#collapse-tir-' + id + '"]');
             if (trigger) trigger.setAttribute('aria-expanded', 'true');
+        });
+    }
+
+    function paHasMatchingTir(paAccordion, maturityValue) {
+        if (maturityValue === '') return true;
+        var tirRows = paAccordion.querySelectorAll('tr[data-maturity]');
+        for (var i = 0; i < tirRows.length; i++) {
+            if (tirRows[i].getAttribute('data-maturity') === maturityValue) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function paMatchesPriority(paAccordion, priorityValue) {
+        if (priorityValue === '') return true;
+        return paAccordion.getAttribute('data-priority') === priorityValue;
+    }
+
+    function applyFilters() {
+        var priorityValue = document.getElementById('priority-filter') ? document.getElementById('priority-filter').value : '';
+        var maturityValue = document.getElementById('maturity-filter') ? document.getElementById('maturity-filter').value : '';
+
+        document.querySelectorAll('.pa-accordion').forEach(function(paAccordion) {
+            var matchPriority = paMatchesPriority(paAccordion, priorityValue);
+            var hasMatchingTir = paHasMatchingTir(paAccordion, maturityValue);
+            var hasVisibleTir = false;
+
+            paAccordion.querySelectorAll('tr[data-maturity]').forEach(function(tirRow) {
+                if (maturityValue === '' || tirRow.getAttribute('data-maturity') === maturityValue) {
+                    tirRow.style.display = '';
+                    hasVisibleTir = true;
+                } else {
+                    tirRow.style.display = 'none';
+                }
+            });
+
+            if (matchPriority && hasVisibleTir) {
+                paAccordion.style.display = '';
+            } else {
+                paAccordion.style.display = 'none';
+            }
+        });
+
+        document.querySelectorAll('.axe-row').forEach(function(axeRow) {
+            var hasVisiblePa = false;
+            axeRow.querySelectorAll('.pa-accordion').forEach(function(paAccordion) {
+                if (paAccordion.style.display !== 'none') {
+                    hasVisiblePa = true;
+                }
+            });
+
+            if (hasVisiblePa) {
+                axeRow.style.display = '';
+            } else {
+                axeRow.style.display = 'none';
+            }
         });
     }
 
@@ -176,23 +234,29 @@
             if (savedPriority) {
                 priorityFilter.value = savedPriority;
             }
+        }
 
-            function applyPriorityFilter(value) {
-                document.querySelectorAll('.pa-row').forEach(function(row) {
-                    if (value === '' || row.getAttribute('data-priority') === value) {
-                        row.style.display = '';
-                    } else {
-                        row.style.display = 'none';
-                    }
-                });
+        var maturityFilter = document.getElementById('maturity-filter');
+        if (maturityFilter) {
+            var savedMaturity = localStorage.getItem(STORAGE_KEY_MATURITY) || '';
+            if (savedMaturity) {
+                maturityFilter.value = savedMaturity;
             }
+        }
 
-            applyPriorityFilter(savedPriority);
+        applyFilters();
 
+        if (priorityFilter) {
             priorityFilter.addEventListener('change', function() {
-                var selectedPriority = this.value;
-                localStorage.setItem(STORAGE_KEY_PRIORITY, selectedPriority);
-                applyPriorityFilter(selectedPriority);
+                localStorage.setItem(STORAGE_KEY_PRIORITY, this.value);
+                applyFilters();
+            });
+        }
+
+        if (maturityFilter) {
+            maturityFilter.addEventListener('change', function() {
+                localStorage.setItem(STORAGE_KEY_MATURITY, this.value);
+                applyFilters();
             });
         }
     });

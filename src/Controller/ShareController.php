@@ -36,6 +36,18 @@ class ShareController extends AbstractController
         $pas = $this->paRepository->findAll();
         $materialities = $this->materialityRepository->findAll();
 
+        $groupedPas = [];
+        foreach ($pas as $pa) {
+            $thematicCode = $pa->getThematic()->getCode();
+            if (!isset($groupedPas[$thematicCode])) {
+                $groupedPas[$thematicCode] = [
+                    'thematic' => $pa->getThematic(),
+                    'pas' => [],
+                ];
+            }
+            $groupedPas[$thematicCode]['pas'][] = $pa;
+        }
+
         $total = 0;
         $count = 0;
         foreach ($thematics as $thematic) {
@@ -46,7 +58,7 @@ class ShareController extends AbstractController
         $score = $count > 0 ? $total / $count : 0;
 
         return $this->render('share/index.html.twig', [
-            'pas' => $pas,
+            'groupedPas' => $groupedPas,
             'score' => $score,
             'materialities' => $materialities,
             'usemenu' => false,
