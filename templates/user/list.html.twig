@@ -23,7 +23,7 @@
                     {% for user in users %}
                         <tr>
                             <td class="text-center"><a href="{{ path(routeupdate,{id:user.id}) }}"><i class="fas fa-file fa-2x"></i></a></td>
-                            <td class="text-center"><img class="avatar" src="{{ asset(user.avatar)}}"></td>
+                            <td class="text-center"><img class="avatar" src="{{ asset(user.avatar|default(''))}}" onerror="this.style.display='none'"></td>
                             <td>{{user.username}}</td>
                             <td>
                                 {% for role in user.roles %}
