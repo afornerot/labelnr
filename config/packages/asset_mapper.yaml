@@ -4,6 +4,16 @@ framework:
         paths:
             - assets/
         missing_import_mode: strict
+        # La CSS FontAwesome embarquee dans bNine-FilesBundle reference des webfonts
+        # (.ttf) qui ne sont PAS livres dans le bundle (seuls les .woff2 le sont).
+        # En mode "strict", l'AssetMapper leve une exception des qu'il compile cette
+        # CSS, ce qui casse TOUTES les requetes /assets/ (le dev server compile
+        # l'ensemble des assets du projet).
+        # On l'exclut donc de l'AssetMapper : le fichier est alors servi
+        # statiquement par Apache depuis public/bundles/bninefiles/ (publie par
+        # `bin/console assets:install public`, cf. misc/script/reconfigure.sh).
+        excluded_patterns:
+            - '*/vendor/bnine/filesbundle/Resources/public/lib/css/fontawesome.min.css'
 
 when@prod:
     framework:
