@@ -14,6 +14,8 @@ Application de gestion de labels NR (Numérique Responsable) pour l'audit RSE.
 
 - Docker et Docker Compose
 
+L'application s'exécute sous **PHP 8.5** (image `reg.cadoles.com/envole/nineapache:8.5`).
+
 ## Installation avec Docker
 
 ```bash
@@ -30,11 +32,12 @@ docker-compose up -d
 
 ### Permissions sur les répertoires d'upload
 
-Les répertoires `uploads/` et `public/uploads/` doivent être accessibles en écriture par le serveur web :
+Les répertoires `uploads/` et `public/uploads/` doivent être accessibles en écriture par le serveur web.
+L'image `reg.cadoles.com/envole/nineapache:8.5` utilise l'utilisateur `apache` avec les identifiants **UID 101 / GID 102** :
 
 ```bash
 # Depuis l'hôte (selon votre configuration de volumes)
-chown -R 82:82 public/uploads uploads
+chown -R 101:102 public/uploads uploads
 ```
 
 ## Configuration

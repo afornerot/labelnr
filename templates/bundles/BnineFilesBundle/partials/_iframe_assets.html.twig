@@ -1,0 +1,37 @@
+{#
+    Surcharge du partial d'assets du bNine-FilesBundle.
+
+    Les templates d'upload et de crop du bundle sont rendus en iframe standalone
+    et ne héritent pas du layout principal. Par défaut, le bundle charge ses
+    propres libs (bundles/bninefiles/lib/...) depuis Resources/public.
+
+    On pointe ici vers les libs deja presentes dans public/lib de l'application :
+    - eviter de charger deux versions de jQuery / Bootstrap dans la page ;
+    - eviter l'erreur AssetMapper "strict" sur la FontAwesome embarquee par le
+      bundle, dont la CSS reference des webfonts .ttf absents de Resources/public.
+
+    Variables disponibles :
+        - _iframe_context : 'upload' | 'crop'
+#}
+{% if _iframe_context == 'upload' %}
+    <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('lib/fontawesome/css/all.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('lib/dropzone/dropzone.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('lib/dropzone/dropzone-bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ asset('bundles/bninefiles/css/bninefiles.css') }}">
+    <script src="{{ asset('lib/jquery/jquery.min.js') }}"></script>
+    <script src="{{ asset('lib/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('lib/dropzone/dropzone.min.js') }}"></script>
+    <script src="{{ asset('bundles/bninefiles/js/bninefiles-constants.js') }}"></script>
+    <script src="{{ asset('bundles/bninefiles/js/bninefiles.js') }}"></script>
+{% elseif _iframe_context == 'crop' %}
+    <link rel="stylesheet" href="{{ asset('lib/bootstrap/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('lib/fontawesome/css/all.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('bundles/bninefiles/lib/css/cropper.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('bundles/bninefiles/css/bninefiles.css') }}">
+    <script src="{{ asset('lib/jquery/jquery.min.js') }}"></script>
+    <script src="{{ asset('lib/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('bundles/bninefiles/lib/js/cropper.min.js') }}"></script>
+    <script src="{{ asset('bundles/bninefiles/js/bninefiles-constants.js') }}"></script>
+    <script src="{{ asset('bundles/bninefiles/js/bninefiles.js') }}"></script>
+{% endif %}

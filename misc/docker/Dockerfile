@@ -1,16 +1,8 @@
-FROM reg.cadoles.com/envole/nineapache:8.2
+FROM reg.cadoles.com/envole/nineapache:8.5
 
 USER root
 
-RUN apk add --no-cache tzdata
-ENV TZ=Europe/Paris
-RUN ln -sf /usr/share/zoneinfo/Europe/Paris /etc/localtime && echo "Europe/Paris" > /etc/timezone
-
 COPY ./misc/docker/apache.conf /etc/apache2/conf.d/nine/site.conf
-
-# Définir le répertoire HOME de composer dans un endroit accessible
-ENV COMPOSER_HOME=/tmp/composer
-RUN mkdir -p /tmp/composer && chown -R apache:apache /tmp/composer
 
 WORKDIR /app
 
