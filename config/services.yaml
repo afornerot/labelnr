@@ -34,3 +34,5 @@ services:
             $urlGenerator: '@router' # Inject the router service
 
     twig.markdown.default: '@App\Service\GfmMarkdownConverter'
+
+    Bnine\FilesBundle\Cache\CachePolicyInterface: '@App\Cache\FileCachePolicy'

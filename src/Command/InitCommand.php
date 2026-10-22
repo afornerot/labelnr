@@ -53,7 +53,7 @@ class InitCommand extends Command
 
                 $user->setUsername($admin);
                 $user->setPassword($hashedPassword);
-                $user->setAvatar('medias/avatar/admin.jpg');
+                $user->setAvatar('**public**/medias/avatar/admin.jpg');
                 $user->setEmail($this->params->get('appNoreply'));
                 $this->em->persist($user);
             }

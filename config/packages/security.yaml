@@ -23,6 +23,11 @@ security:
       custom_authenticators:
         - App\Security\ShareTokenAuthenticator
 
+    bninefiles_public:
+      pattern: ^/bninefiles/(image|thumbnail)/(avatar|logo|icon)/
+      security: false
+      stateless: true
+
     main:
       pattern: ^/
       provider: sql_provider

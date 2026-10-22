@@ -9,6 +9,8 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class FileVoter extends AbstractFileVoter
 {
+    private const PUBLIC_DOMAINS = ['avatar', 'logo', 'icon'];
+
     public function __construct(
         private TIRRepository $tirRepository,
     ) {
@@ -16,6 +18,10 @@ class FileVoter extends AbstractFileVoter
 
     protected function canView(string $domain, $id, TokenInterface $token): bool
     {
+        if (in_array($domain, self::PUBLIC_DOMAINS, true)) {
+            return true;
+        }
+
         $user = $token->getUser();
 
         if ($user instanceof \Symfony\Component\Security\Core\User\InMemoryUser && in_array('ROLE_API_DOWNLOAD', $token->getRoleNames())) {
@@ -43,6 +49,10 @@ class FileVoter extends AbstractFileVoter
             return true;
         }
 
+        if ('avatar' === $domain && (int) $id === $user->getId()) {
+            return true;
+        }
+
         switch ($domain) {
             case 'evidence':
                 $evidence = $this->tirRepository->find($id);
@@ -62,6 +72,10 @@ class FileVoter extends AbstractFileVoter
             return false;
         }
         if ($user->hasRole('ROLE_ADMIN')) {
+            return true;
+        }
+
+        if ('avatar' === $domain && (int) $id === $user->getId()) {
             return true;
         }
 

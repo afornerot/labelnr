@@ -78,19 +78,6 @@
             "var/storage/.gitignore"
         ]
     },
-    "oneup/uploader-bundle": {
-        "version": "5.1",
-        "recipe": {
-            "repo": "github.com/symfony/recipes-contrib",
-            "branch": "main",
-            "version": "2.0",
-            "ref": "b19678d1535b9fe7cdf4647fd3483455e4fca458"
-        },
-        "files": [
-            "config/packages/oneup_uploader.yaml",
-            "config/routes/oneup_uploader.yaml"
-        ]
-    },
     "phpunit/phpunit": {
         "version": "11.5",
         "recipe": {
