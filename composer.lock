@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "be3eca4234fda359a2e883ad1f12cbf8",
+    "content-hash": "3f31ebb91704438da41601c403b0804d",
     "packages": [
         {
             "name": "apereo/phpcas",
@@ -133,16 +133,16 @@
         },
         {
             "name": "aws/aws-sdk-php",
-            "version": "3.401.4",
+            "version": "3.402.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/aws/aws-sdk-php.git",
-                "reference": "b5941e2da9fb860f06ad5046d96219c4288ab6b8"
+                "reference": "661f6a54f2a63ac5137390c291535c74cfe6019e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/b5941e2da9fb860f06ad5046d96219c4288ab6b8",
-                "reference": "b5941e2da9fb860f06ad5046d96219c4288ab6b8",
+                "url": "https://api.github.com/repos/aws/aws-sdk-php/zipball/661f6a54f2a63ac5137390c291535c74cfe6019e",
+                "reference": "661f6a54f2a63ac5137390c291535c74cfe6019e",
                 "shasum": ""
             },
             "require": {
@@ -154,7 +154,7 @@
                 "guzzlehttp/promises": "^2.0.3 || ^3.0",
                 "guzzlehttp/psr7": "^2.6.3 || ^3.0",
                 "mtdowling/jmespath.php": "^2.9.1",
-                "php": ">=8.1",
+                "php": ">=8.2",
                 "psr/http-message": "^1.0 || ^2.0",
                 "symfony/filesystem": "^v5.4.45 || ^v6.4.3 || ^v7.1.0 || ^v8.0.0"
             },
@@ -224,22 +224,22 @@
             "support": {
                 "forum": "https://github.com/aws/aws-sdk-php/discussions",
                 "issues": "https://github.com/aws/aws-sdk-php/issues",
-                "source": "https://github.com/aws/aws-sdk-php/tree/3.401.4"
+                "source": "https://github.com/aws/aws-sdk-php/tree/3.402.0"
             },
-            "time": "2026-10-20T18:15:27+00:00"
+            "time": "2026-10-22T18:09:05+00:00"
         },
         {
             "name": "bnine/filesbundle",
-            "version": "v1.5.10",
+            "version": "v1.5.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/afornerot/bNine-FilesBundle.git",
-                "reference": "a045cd618e68da38d1964fa9db96e7b9c13e6d97"
+                "reference": "d2c4787abf53036fae1860053bce8a5f17fead49"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/afornerot/bNine-FilesBundle/zipball/a045cd618e68da38d1964fa9db96e7b9c13e6d97",
-                "reference": "a045cd618e68da38d1964fa9db96e7b9c13e6d97",
+                "url": "https://api.github.com/repos/afornerot/bNine-FilesBundle/zipball/d2c4787abf53036fae1860053bce8a5f17fead49",
+                "reference": "d2c4787abf53036fae1860053bce8a5f17fead49",
                 "shasum": ""
             },
             "require": {
@@ -300,33 +300,34 @@
             ],
             "support": {
                 "issues": "https://github.com/afornerot/bNine-FilesBundle/issues",
-                "source": "https://github.com/afornerot/bNine-FilesBundle/tree/v1.5.10"
+                "source": "https://github.com/afornerot/bNine-FilesBundle/tree/v1.5.11"
             },
-            "time": "2026-10-22T20:30:17+00:00"
+            "time": "2026-10-22T20:50:18+00:00"
         },
         {
             "name": "bnine/mdeditorbundle",
-            "version": "v1.1.5",
+            "version": "v1.1.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/afornerot/bNine-MdEditorBundle.git",
-                "reference": "ab56ca3601145d2a393160546a534eac9be33cf5"
+                "reference": "e5255d044d01f0fe98890621284ae95c3782c519"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/afornerot/bNine-MdEditorBundle/zipball/ab56ca3601145d2a393160546a534eac9be33cf5",
-                "reference": "ab56ca3601145d2a393160546a534eac9be33cf5",
+                "url": "https://api.github.com/repos/afornerot/bNine-MdEditorBundle/zipball/e5255d044d01f0fe98890621284ae95c3782c519",
+                "reference": "e5255d044d01f0fe98890621284ae95c3782c519",
                 "shasum": ""
             },
             "require": {
+                "league/commonmark": "^2.7",
                 "php": "^8.1",
-                "symfony/framework-bundle": "^7.1"
+                "symfony/form": "^7.1",
+                "symfony/framework-bundle": "^7.1",
+                "twig/markdown-extra": "^3.0",
+                "twig/twig": "^3.12"
             },
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "^3.85"
-            },
-            "suggest": {
-                "oneup/uploader-bundle": "^4.0"
             },
             "type": "symfony-bundle",
             "extra": {
@@ -349,19 +350,20 @@
                     "email": "arno.nanor@gmail.com"
                 }
             ],
-            "description": "Symfony bundle for entity-based file browser and management.",
+            "description": "Symfony bundle providing an EasyMDE Markdown form type and its assets",
             "keywords": [
                 "bundle",
+                "easymde",
                 "editor",
-                "entity",
+                "form",
                 "markdown",
                 "symfony"
             ],
             "support": {
                 "issues": "https://github.com/afornerot/bNine-MdEditorBundle/issues",
-                "source": "https://github.com/afornerot/bNine-MdEditorBundle/tree/v1.1.5"
+                "source": "https://github.com/afornerot/bNine-MdEditorBundle/tree/v1.1.6"
             },
-            "time": "2025-08-04T17:34:17+00:00"
+            "time": "2026-10-22T20:56:14+00:00"
         },
         {
             "name": "brick/math",
