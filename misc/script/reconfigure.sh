@@ -13,4 +13,8 @@ bin/console app:init
 # Publier les assets des bundles (bninefiles, bninemdeditor) dans public/bundles/
 bin/console assets:install public
 
+# Compiler l'AssetMapper (prod) : sans cette étape, les asset() des bundles
+# (bninefiles/bninemdeditor) renvoient des URLs /assets/... non servies.
+bin/console asset-map:compile
+
 exec $@
