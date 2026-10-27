@@ -3,7 +3,6 @@
 namespace App\Security;
 
 use App\Repository\UserRepository;
-use Jumbojett\OpenIDConnectClient;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -48,6 +47,12 @@ class DynamicAuthenticator extends AbstractAuthenticator
             return true;
         }
 
+        // En mode OIDC, l'authentification est portée par OidcAuthenticator et
+        // AuthGuardEntryPoint : ce garde ne doit pas s'en mêler.
+        if ('OIDC' === $this->modeAuth) {
+            return false;
+        }
+
         $currentPath = $request->getPathInfo();
         if (in_array($currentPath, ['/login', '/logout', '/rest/dossier', '/rest/weekly', '/api/print', '/share/'])) {
             return false;
@@ -77,10 +82,6 @@ class DynamicAuthenticator extends AbstractAuthenticator
 
             case 'CAS':
                 return $this->authenticateWithCas($request);
-
-            case 'OIDC':
-                return $this->authenticateWithOidc($request);
-
             default:
                 throw new \InvalidArgumentException('Invalid authentication method');
         }
@@ -150,45 +151,6 @@ class DynamicAuthenticator extends AbstractAuthenticator
 
         $userBadge = new UserBadge($username, function ($userIdentifier) use ($attributes) {
             return $this->casUserProvider->loadUserByIdentifierAndCASAttributes($userIdentifier, $attributes);
-        });
-
-        return new SelfValidatingPassport($userBadge);
-    }
-
-    private function authenticateWithOidc(Request $request): Passport
-    {
-        $oidc = new OpenIDConnectClient(
-            $this->parameterBag->get('oidcIssuer'),
-            $this->parameterBag->get('oidcClientId'),
-            $this->parameterBag->get('oidcClientSecret')
-        );
-
-        // L'URI de redirection doit correspondre à celle configurée chez le fournisseur OIDC
-        $oidc->setRedirectURL($this->parameterBag->get('oidcRedirectUri'));
-
-        // Lance le processus d'authentification (redirections, etc.)
-        $oidc->authenticate();
-
-        // Stocke l'id_token pour la déconnexion future
-        $request->getSession()->set('oidc_id_token', $oidc->getIdToken());
-
-        // Récupère les informations de l'utilisateur
-        $userInfo = $oidc->requestUserInfo();
-
-        if (!$userInfo) {
-            throw new AuthenticationException('OIDC authentication failed: could not retrieve user info.');
-        }
-
-        $usernameAttribute = $this->parameterBag->get('oidcUsernameAttribute');
-        $username = $userInfo->{$usernameAttribute} ?? null;
-        $attributes = (array) $userInfo;
-
-        if (!$username) {
-            throw new AuthenticationException(sprintf('OIDC authentication failed: "%s" claim is missing or empty.', $usernameAttribute));
-        }
-
-        $userBadge = new UserBadge($username, function ($userIdentifier) use ($attributes) {
-            return $this->casUserProvider->loadUserByIdentifierAndOIDCAttributes($userIdentifier, $attributes);
         });
 
         return new SelfValidatingPassport($userBadge);

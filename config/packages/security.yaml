@@ -31,7 +31,9 @@ security:
     main:
       pattern: ^/
       provider: sql_provider
+      entry_point: App\Security\AuthGuardEntryPoint
       custom_authenticators:
+        - App\Security\OidcAuthenticator
         - App\Security\DynamicAuthenticator
         - App\Security\ShareTokenAuthenticator
       form_login:

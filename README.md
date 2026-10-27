@@ -58,6 +58,9 @@ CAS_PATH=/cas
 OIDC_ISSUER=https://...
 OIDC_CLIENTID=...
 OIDC_CLIENTSECRET=...
+OIDC_REDIRECTURI=https://labelnr.example.com/
+OIDC_MAILATTRIBUTE=email
+OIDC_USERNAMEATTRIBUTE=preferred_username
 ```
 
 ## Utilisation
