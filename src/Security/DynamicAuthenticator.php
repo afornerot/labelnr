@@ -71,9 +71,8 @@ class DynamicAuthenticator extends AbstractAuthenticator
                 $apiUser = new InMemoryUser('api_user', null, ['ROLE_API_DOWNLOAD']);
 
                 return new SelfValidatingPassport(new UserBadge($apiUser->getUserIdentifier(), fn () => $apiUser));
-            } else {
-                throw new AuthenticationException('Invalid appSecret for file download.');
             }
+            throw new AuthenticationException('Invalid appSecret for file download.');
         }
 
         switch ($this->modeAuth) {

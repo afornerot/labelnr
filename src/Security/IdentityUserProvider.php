@@ -56,15 +56,13 @@ class IdentityUserProvider implements UserProviderInterface
         $user = $this->userRepository->findOneBy(['username' => $identifier]);
         $isNew = null === $user;
 
-        if (!$isNew && $user->getEmail() !== $email) {
-            $this->assertEmailIsFree($email, $user->getId());
+        // Un email déjà attribué à un autre compte ferait échouer la
+        // contrainte d'unicité au flush (500 Doctrine). On refuse proprement.
+        if ($isNew || $user->getEmail() !== $email) {
+            $this->assertEmailIsFree($email, $user?->getId());
         }
 
         if ($isNew) {
-            // L'email doit être libre : sans ce garde-fou, la contrainte
-            // d'unicité se traduit par une 500 Doctrine au premier login.
-            $this->assertEmailIsFree($email, null);
-
             $user = new User();
             $user->setUsername($identifier);
             $user->setPassword(
@@ -78,8 +76,9 @@ class IdentityUserProvider implements UserProviderInterface
 
         if ($isNew) {
             $this->em->persist($user);
-            $this->em->flush();
-        } elseif ($dirty) {
+        }
+
+        if ($isNew || $dirty) {
             $this->em->flush();
         }
 

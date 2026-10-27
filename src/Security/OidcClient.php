@@ -107,11 +107,7 @@ class OidcClient
                 ? $token['error_description']
                 : 'sans description';
 
-            throw new AuthenticationException(sprintf(
-                'OIDC: le fournisseur a refusé l\'échange du code (%s : %s).',
-                (string) $token['error'],
-                $description
-            ));
+            throw new AuthenticationException(sprintf('OIDC: le fournisseur a refusé l\'échange du code (%s : %s).', (string) $token['error'], $description));
         }
 
         if (!\is_string($token['id_token'] ?? null) || '' === $token['id_token']) {
